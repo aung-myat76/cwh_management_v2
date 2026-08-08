@@ -10,6 +10,7 @@ const Truck = ({
     wh_or_sale,
     distributor,
     condition,
+    logId,
     updateCondition
 }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -22,6 +23,7 @@ const Truck = ({
                     type: null,
                     wh_or_sale: null,
                     distributor: null,
+                    logId: null,
                     condition: state.condition
                 });
             } else {
@@ -63,6 +65,7 @@ const Truck = ({
                 cb={handleUpdateState}
                 truckNo={truckNo}
                 type={type}
+                logId={logId}
                 wh_or_sale={wh_or_sale}
                 distributor={distributor}
             />

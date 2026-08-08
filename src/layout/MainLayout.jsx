@@ -51,6 +51,18 @@ const MainLayout = ({ handleReset, getLastUpdatedTime }) => {
                                 : ""
                         )
                     }
+                    to={"/loading-log"}>
+                    Loading Log
+                </NavLink>
+                <NavLink
+                    className={({ isActive }) =>
+                        cn(
+                            " px-1 mx-2 font-bold",
+                            isActive
+                                ? "text-emerald-500 border-b-2 border-emerald-500 pb-1"
+                                : ""
+                        )
+                    }
                     to={"/packaging"}>
                     Packaging
                 </NavLink>

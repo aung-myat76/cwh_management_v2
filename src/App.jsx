@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { collectionId, databases, client, dbId } from "./lib/appwrite";
+// import { collectionId, databases, client, dbId } from "./lib/appwrite";
 import "./App.css";
-import TruckList from "./components/TruckList";
-import cn from "./lib/cn";
-import ConfirmModal from "./components/ConfirmModal";
+// import TruckList from "./components/TruckList";
+// import cn from "./lib/cn";
+// import ConfirmModal from "./components/ConfirmModal";
 import { supabase } from "./superbaseClient";
 import Packaging from "./pages/Packaging";
 import MainLayout from "./layout/MainLayout";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Loading from "./pages/Loading";
+import LoadingLog from "./pages/LoadingLog";
 
 // const getShift = () => {
 //     const time = now.getHours();
@@ -23,6 +24,7 @@ import Loading from "./pages/Loading";
 const App = () => {
     const [trucks, setTrucks] = useState([]);
     const [lines, setLines] = useState([]);
+    const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(false);
 
     // const [isOpen, setIsOpen] = useState(false);
@@ -31,24 +33,75 @@ const App = () => {
     // const onClose = () => setIsOpen(false);
 
     const updateCondition = useCallback(async (id, newState) => {
+        console.log(newState);
         setTrucks((preTrucks) => {
             const updatedTrucks = [...preTrucks];
             const updateTruckIndex = updatedTrucks.findIndex(
                 (t) => t.id === id
             );
+            const updatedTruck = updatedTrucks[updateTruckIndex];
             console.log(updatedTrucks);
-            updatedTrucks[updateTruckIndex].condition = newState.condition;
-            updatedTrucks[updateTruckIndex]["truck_no"] = newState["truck_no"];
-            updatedTrucks[updateTruckIndex]["type"] = newState["type"];
-            updatedTrucks[updateTruckIndex]["wh_or_sale"] =
-                newState["wh_or_sale"];
-            updatedTrucks[updateTruckIndex]["distributor"] =
-                newState["distributor"];
+            updatedTruck.condition = newState.condition;
+            updatedTruck["truck_no"] = newState["truck_no"];
+            updatedTruck["type"] = newState["type"];
+            updatedTruck["wh_or_sale"] = newState["wh_or_sale"];
+            updatedTruck["distributor"] = newState["distributor"];
 
             return updatedTrucks;
         });
+
+        // add loading log
+        console.log(newState);
+        if (!newState.logId) {
+            const newLog = await supabase.from("loading-log").insert({
+                truck_no: newState.truck_no,
+                type: newState.type,
+                loading_bay: newState.loading_bay,
+                distributor: newState.distributor,
+                wh_or_sale: newState.wh_or_sale,
+                start_time: new Date().getTime(),
+                finish_time: null,
+                remark: null
+            });
+
+            if (newLog.status !== 200) {
+                return;
+            }
+
+            console.log(newLog);
+            setLogs((preLogs) => {
+                const updatedLogs = preLogs.length > 0 ? [...preLogs] : [];
+                updatedLogs.push(newLog);
+                return updatedLogs;
+            });
+
+            return await supabase
+                .from("trucks")
+                .update({ ...newState, logId: newLog.data.id })
+                .eq("id", id);
+        } else if (
+            newState.logId &&
+            (newState.condition === "Free" || newState.condition === "Blocked")
+        ) {
+            console.log("exist");
+            const updatedLog = await supabase
+                .from("loading-log")
+                .update({ ...newState, finish_time: new Date().getTime() })
+                .eq("id", newState.logId);
+
+            setLogs((preLogs) => {
+                const updatedLogs = preLogs.length > 0 ? [...preLogs] : [];
+                const selectedLog = updatedLogs.find(
+                    (l) => l.id === newState.logId
+                );
+
+                if (selectedLog) {
+                    selectedLog.finish_time = updatedLog.finish_time;
+                }
+                return updatedLogs;
+            });
+        }
         // return await databases.updateDocument(dbId, collectionId, id, newState);
-        return await supabase.from("trucks").update(newState).eq("id", id);
     }, []);
 
     const updateLine = useCallback(async (id, newState) => {
@@ -140,7 +193,7 @@ const App = () => {
         const getData = async () => {
             // const data = await databases.listDocuments(dbId, collectionId);
 
-            const [truckRes, PackagingRes] = await Promise.all([
+            const [truckRes, PackagingRes, LogRes] = await Promise.all([
                 supabase
                     .from("trucks")
                     .select("*")
@@ -148,10 +201,15 @@ const App = () => {
                 supabase
                     .from("packaging")
                     .select("*")
+                    .order("id", { ascending: true }),
+                supabase
+                    .from("loading-log")
+                    .select("*")
                     .order("id", { ascending: true })
             ]);
             if (truckRes.data) setTrucks(truckRes.data);
             if (PackagingRes.data) setLines(PackagingRes.data);
+            if (LogRes.data) setLogs(LogRes.data);
             // setFilterTrucks(data.documents);
         };
         getData();
@@ -206,6 +264,19 @@ const App = () => {
                     }
                 }
             )
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "loading-log" },
+                (payload) => {
+                    if (payload.eventType === "INSERT") {
+                        setLogs((current) =>
+                            current.map((l) =>
+                                l.id === payload.new.id ? payload.new : l
+                            )
+                        );
+                    }
+                }
+            )
             .subscribe();
 
         return () => supabase.removeChannel(unsubscribe);
@@ -213,13 +284,7 @@ const App = () => {
 
     const handleReset = async () => {
         setLoading(true);
-        // const data = await databases.listDocuments(dbId, collectionId);
-        // const allPromises = data.documents.map((truck) => {
-        //     databases.updateDocument(dbId, collectionId, truck.$id, {
-        //         condition: "Free",
-        //         truck_no: '-'
-        //     });
-        // });
+
         const { data } = await supabase
             .from("trucks")
             .update({
@@ -230,7 +295,7 @@ const App = () => {
                 distributor: null
             })
             .not("id", "is", null);
-        // await Promise.all(allPromises);
+        console.log(data);
         setTrucks((preTrucks) => {
             const updatedTrucks = [...preTrucks];
             updatedTrucks.map((t) => {
@@ -245,6 +310,8 @@ const App = () => {
         });
         setLoading(false);
     };
+
+    console.log(logs);
 
     return (
         <Routes>
@@ -265,6 +332,10 @@ const App = () => {
                             updateCondition={updateCondition}
                         />
                     }
+                />
+                <Route
+                    path="/loading-log"
+                    element={<LoadingLog loadingLogs={logs} />}
                 />
                 <Route
                     path="/packaging"

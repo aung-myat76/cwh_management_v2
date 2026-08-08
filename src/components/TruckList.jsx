@@ -1,6 +1,7 @@
 import Truck from "./Truck";
 
 const TruckList = ({ trucks, state, updateCondition }) => {
+    console.log(trucks);
     const filterTrucks =
         state === "All" ? trucks : trucks.filter((t) => t.condition === state);
 
@@ -25,6 +26,7 @@ const TruckList = ({ trucks, state, updateCondition }) => {
                             type={truck["type"]}
                             wh_or_sale={truck["wh_or_sale"]}
                             distributor={truck["distributor"]}
+                            logId={truck["logId"]}
                             updateCondition={updateCondition}
                         />
                     );

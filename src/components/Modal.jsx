@@ -10,6 +10,7 @@ const Modal = ({
     distributor,
     wh_or_sale,
     loadingBay,
+    logId,
     isOpen,
     onClose,
     cb
@@ -26,7 +27,8 @@ const Modal = ({
             truck_no: truckRef.current.value || null,
             type: typeRef.current.value || null,
             wh_or_sale: whOrSaleRef.current.value || null,
-            distributor: distributorRef.current.value || null
+            distributor: distributorRef.current.value || null,
+            logId: logId
         });
         onClose();
     };
