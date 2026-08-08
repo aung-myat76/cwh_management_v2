@@ -1,6 +1,7 @@
 import { useState } from "react";
 import cn from "../lib/cn";
 import Modal from "./Modal";
+import { supabase } from "../superbaseClient";
 
 const Truck = ({
     id,
@@ -11,6 +12,7 @@ const Truck = ({
     distributor,
     condition,
     logId,
+    updateLog,
     updateCondition
 }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,11 +25,24 @@ const Truck = ({
                     type: null,
                     wh_or_sale: null,
                     distributor: null,
-                    logId: null,
+                    logId: state.logId,
                     condition: state.condition
                 });
             } else {
-                await updateCondition(id, state);
+                console.log(state);
+                const { data } = await supabase
+                    .from("loading-log")
+                    .update({
+                        truck_no: state.truck_no,
+                        type: +state.type,
+                        distributor: state.distributor,
+                        wh_or_sale: state.wh_or_sale,
+                        loading_bay: state.loading_bay
+                    })
+                    .eq("id", state.logId)
+                    .select();
+                // updateLog({ ...data[0] });
+                await updateCondition(id, { ...state });
             }
         }
     };
@@ -63,6 +78,7 @@ const Truck = ({
                 isOpen={isOpen}
                 onClose={onClose}
                 cb={handleUpdateState}
+                updateLog={updateLog}
                 truckNo={truckNo}
                 type={type}
                 logId={logId}

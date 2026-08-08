@@ -1,6 +1,5 @@
 import ReactDom from "react-dom";
 import { useRef } from "react";
-import { collectionId, databases, dbId } from "../lib/appwrite";
 import { supabase } from "../superbaseClient";
 
 const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {

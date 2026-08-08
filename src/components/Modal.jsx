@@ -1,6 +1,5 @@
 import ReactDom from "react-dom";
 import { useRef } from "react";
-import { collectionId, databases, dbId } from "../lib/appwrite";
 import { supabase } from "../superbaseClient";
 
 const Modal = ({
@@ -13,7 +12,8 @@ const Modal = ({
     logId,
     isOpen,
     onClose,
-    cb
+    cb,
+    updateLog
 }) => {
     const truckRef = useRef(null);
     const typeRef = useRef(null);
@@ -37,15 +37,39 @@ const Modal = ({
         // await databases.updateDocument(dbId, collectionId, id, {
         //     truck_no: truckRef.current.value || '-'
         // });
-        await supabase
+        const { data } = await supabase.from("trucks").select().eq("id", id);
+        const updatedTruck = await supabase
             .from("trucks")
             .update({
+                ...data[0],
                 truck_no: truckRef.current.value || null,
                 type: typeRef.current.value || null,
                 wh_or_sale: whOrSaleRef.current.value || null,
-                distributor: distributorRef.current.value || null
+                distributor: distributorRef.current.value || null,
+                logId: logId
             })
             .eq("id", id);
+        console.log(data, updatedTruck);
+        if (logId) {
+            const { data } = await supabase
+                .from("loading-log")
+                .select()
+                .eq("id", logId);
+            console.log(data);
+            const updatedLog = await supabase
+                .from("loading-log")
+                .update({
+                    ...data[0],
+                    truck_no: truckRef.current.value || null,
+                    type: typeRef.current.value || null,
+                    wh_or_sale: whOrSaleRef.current.value || null,
+                    distributor: distributorRef.current.value || null
+                })
+                .eq("id", logId)
+                .select();
+            console.log(updatedLog.data);
+            updateLog(logId, { ...updatedLog.data[0] });
+        }
         onClose();
     };
 
