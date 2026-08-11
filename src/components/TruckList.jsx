@@ -1,6 +1,12 @@
 import Truck from "./Truck";
 
-const TruckList = ({ trucks, state, updateCondition, updateLog }) => {
+const TruckList = ({
+    trucks,
+    state,
+    updateCondition,
+    updateLog,
+    updateTruck
+}) => {
     const filterTrucks =
         state === "All" ? trucks : trucks.filter((t) => t.condition === state);
 
@@ -27,6 +33,7 @@ const TruckList = ({ trucks, state, updateCondition, updateLog }) => {
                             distributor={truck["distributor"]}
                             logId={truck["logId"]}
                             updateLog={updateLog}
+                            updateTruck={updateTruck}
                             updateCondition={updateCondition}
                         />
                     );

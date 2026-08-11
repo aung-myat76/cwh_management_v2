@@ -84,10 +84,7 @@ const App = () => {
                 .from("trucks")
                 .update({ ...newState, logId: newLog.data[0].id })
                 .eq("id", id);
-        } else if (
-            newState.logId &&
-            (newState.condition === "Free" || newState.condition === "Blocked")
-        ) {
+        } else if (newState.logId) {
             console.log("exist");
             const { data } = await supabase
                 .from("loading-log")
@@ -100,15 +97,22 @@ const App = () => {
                     finish_time: new Date().getTime()
                 })
                 .eq("id", newState.logId);
+            let truck = { ...newState };
 
-            const resetTruck = {
-                condition: "Free",
-                truck_no: null,
-                wh_or_sale: null,
-                type: null,
-                distributor: null,
-                logId: null
-            };
+            if (
+                newState.condition === "Free" ||
+                newState.condition === "Blocked"
+            ) {
+                truck = {
+                    ...newState,
+                    condition: newState.condition,
+                    truck_no: null,
+                    wh_or_sale: null,
+                    type: null,
+                    distributor: null,
+                    logId: null
+                };
+            }
 
             setTrucks((preTrucks) => {
                 const updatedTrucks = [...preTrucks];
@@ -116,12 +120,13 @@ const App = () => {
                     (t) => t.id === id
                 );
                 const updatedTruck = updatedTrucks[updateTruckIndex];
-                updatedTruck.condition = "Free";
-                updatedTruck["truck_no"] = null;
-                updatedTruck["type"] = null;
-                updatedTruck["wh_or_sale"] = null;
-                updatedTruck["distributor"] = null;
-                updatedTruck["logId"] = null;
+                updatedTruck.condition = newState.condition;
+                updatedTruck["truck_no"] = truck.truck_no;
+                updatedTruck["type"] = truck.type;
+                updatedTruck["wh_or_sale"] = truck.wh_or_sale;
+                updatedTruck["distributor"] = truck.distributor;
+                updatedTruck["logId"] =
+                    truck.condition === "Loaded" ? truck.logId : null;
                 return updatedTrucks;
             });
 
@@ -138,7 +143,7 @@ const App = () => {
             });
             return await supabase
                 .from("trucks")
-                .update({ ...resetTruck })
+                .update({ ...truck })
                 .eq("id", id);
         }
 
@@ -349,21 +354,39 @@ const App = () => {
             return updatedLogs;
         });
     };
+    const updateTruck = (id, updatedTruck) => {
+        console.log(updatedTruck);
+        setTrucks((preTrucks) => {
+            const updatedTrucks = [...preTrucks];
+            const logIndex = updatedTrucks.findIndex((l) => l.id === id);
+            const selectedTruck = updatedTrucks[logIndex];
+            console.log(selectedTruck);
+            selectedTruck.truck_no = updatedTruck.truck_no;
+            selectedTruck.type = updatedTruck.type;
+            selectedTruck.distributor = updatedTruck.distributor;
+            selectedTruck.wh_or_sale = updatedTruck.wh_or_sale;
+            return updatedTrucks;
+        });
+    };
 
     const handleReset = async () => {
         setLoading(true);
 
-        const { data } = await supabase
-            .from("trucks")
-            .update({
-                condition: "Free",
-                truck_no: null,
-                wh_or_sale: null,
-                type: null,
-                logId: null,
-                distributor: null
-            })
-            .not("id", "is", null);
+        const [loading, log] = await Promise.all([
+            supabase
+                .from("trucks")
+                .update({
+                    condition: "Free",
+                    truck_no: null,
+                    wh_or_sale: null,
+                    type: null,
+                    logId: null,
+                    distributor: null
+                })
+                .not("id", "is", null),
+            supabase.from("loading-log").delete().gt("id", 0)
+        ]);
+        console.log(loading, log);
         setTrucks((preTrucks) => {
             const updatedTrucks = [...preTrucks];
             updatedTrucks.map((t) => {
@@ -375,6 +398,7 @@ const App = () => {
             });
             return updatedTrucks;
         });
+        setLogs([]);
         setLoading(false);
     };
 
@@ -395,6 +419,7 @@ const App = () => {
                             trucks={trucks}
                             loading={loading}
                             updateLog={updateLog}
+                            updateTruck={updateTruck}
                             updateCondition={updateCondition}
                         />
                     }

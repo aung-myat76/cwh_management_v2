@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import calculateDuration from "../lib/calculateDuration";
 
 const LoadingLogRow = ({ log, index }) => {
     // const { loadingLogs } = useAppState();
@@ -160,6 +161,10 @@ const LoadingLogRow = ({ log, index }) => {
                     }
                     type="time"
                 />
+            </td>
+            <td className="py-2 px-3 font-bold text-center text-slate-400 bg-slate-50/50 select-none">
+                {/* {log.loading_bay} */}
+                {calculateDuration(log.start_time, log.finish_time)}
             </td>
             <td className="py-2 px-3 font-bold text-center text-slate-400 bg-slate-50/50 select-none">
                 {log.loading_bay}

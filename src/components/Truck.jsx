@@ -13,6 +13,7 @@ const Truck = ({
     condition,
     logId,
     updateLog,
+    updateTruck,
     updateCondition
 }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -30,17 +31,20 @@ const Truck = ({
                 });
             } else {
                 console.log(state);
-                const { data } = await supabase
-                    .from("loading-log")
-                    .update({
-                        truck_no: state.truck_no,
-                        type: +state.type,
-                        distributor: state.distributor,
-                        wh_or_sale: state.wh_or_sale,
-                        loading_bay: state.loading_bay
-                    })
-                    .eq("id", state.logId)
-                    .select();
+                if (state.logId) {
+                    const { data } = await supabase
+                        .from("loading-log")
+                        .update({
+                            truck_no: state.truck_no,
+                            type: +state.type,
+                            distributor: state.distributor,
+                            wh_or_sale: state.wh_or_sale,
+                            loading_bay: loadingBay
+                        })
+                        .eq("id", state.logId)
+                        .select();
+                }
+
                 // updateLog({ ...data[0] });
                 await updateCondition(id, { ...state });
             }
@@ -79,6 +83,7 @@ const Truck = ({
                 onClose={onClose}
                 cb={handleUpdateState}
                 updateLog={updateLog}
+                updateTruck={updateTruck}
                 truckNo={truckNo}
                 type={type}
                 logId={logId}

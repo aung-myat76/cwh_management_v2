@@ -13,7 +13,8 @@ const Modal = ({
     isOpen,
     onClose,
     cb,
-    updateLog
+    updateLog,
+    updateTruck
 }) => {
     const truckRef = useRef(null);
     const typeRef = useRef(null);
@@ -28,6 +29,7 @@ const Modal = ({
             type: typeRef.current.value || null,
             wh_or_sale: whOrSaleRef.current.value || null,
             distributor: distributorRef.current.value || null,
+            loading_bay: loadingBay,
             logId: logId
         });
         onClose();
@@ -48,8 +50,13 @@ const Modal = ({
                 distributor: distributorRef.current.value || null,
                 logId: logId
             })
-            .eq("id", id);
+            .eq("id", id)
+            .select();
+        if (updatedTruck.data[0]) {
+            updateTruck(id, { ...updatedTruck.data[0] });
+        }
         console.log(data, updatedTruck);
+
         if (logId) {
             const { data } = await supabase
                 .from("loading-log")
@@ -63,6 +70,7 @@ const Modal = ({
                     truck_no: truckRef.current.value || null,
                     type: typeRef.current.value || null,
                     wh_or_sale: whOrSaleRef.current.value || null,
+                    loading_bay: loadingBay,
                     distributor: distributorRef.current.value || null
                 })
                 .eq("id", logId)
@@ -70,6 +78,7 @@ const Modal = ({
             console.log(updatedLog.data);
             updateLog(logId, { ...updatedLog.data[0] });
         }
+
         onClose();
     };
 

@@ -1,7 +1,103 @@
 import LoadingLogRow from "../components/LoadingLogRow";
 
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import calculateDuration from "../lib/calculateDuration";
+
 const LoadingLog = ({ loadingLogs }) => {
     console.log(loadingLogs);
+
+    const handleExportToExcel = async () => {
+        if (!confirm("Are you sure to export as an Excel file?")) return;
+        if (loadingLogs.length === 0)
+            return alert("No dataset records available to export.");
+
+        // 1. Map dataset cleanly (Content kept 100% identical)
+        const spreadsheetRows = loadingLogs.map((log, index) => ({
+            "No.": index + 1,
+            "Truck Number": log.truck_no?.toUpperCase() || "—",
+            "Truck Type": log.type ? `${log.type}` : "N/A",
+            Distributor: log.distributor || "—",
+            "Start Time": new Date(log.start_time).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            }),
+            "Finish Time": log.finish_time
+                ? new Date(log.finish_time).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false
+                  })
+                : "Pending",
+            Duration: calculateDuration(log.start_time, log.finish_time),
+            "Loading Bay": log.loading_bay
+        }));
+
+        // 2. Create Workbook & Worksheet
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Operational Logs");
+
+        // 3. Define Columns & Headers
+        const headers = Object.keys(spreadsheetRows[0]);
+        worksheet.columns = headers.map((header) => ({
+            header: header,
+            key: header,
+            width: 20 // Auto-width for clear visibility
+        }));
+
+        // 4. Add Rows Data
+        spreadsheetRows.forEach((rowData) => {
+            worksheet.addRow(rowData);
+        });
+
+        // 5. Apply Formatting (Header: Blue BG, Bold White Text | All Cells: Centered)
+        worksheet.eachRow((row, rowNumber) => {
+            row.eachCell((cell) => {
+                // Center text across every single cell
+                cell.alignment = { horizontal: "center", vertical: "middle" };
+
+                // Header Row Styling (Row 1)
+                if (rowNumber === 1) {
+                    cell.font = {
+                        name: "Arial",
+                        bold: true,
+                        color: { argb: "FFFFFF" }, // White Text
+                        size: 11
+                    };
+                    cell.fill = {
+                        type: "pattern",
+                        pattern: "solid",
+                        fgColor: { argb: "1E40AF" } // Industrial Blue (Tailwind blue-800)
+                    };
+                    cell.border = {
+                        top: { style: "thin", color: { argb: "000000" } },
+                        bottom: { style: "medium", color: { argb: "000000" } },
+                        left: { style: "thin", color: { argb: "000000" } },
+                        right: { style: "thin", color: { argb: "000000" } }
+                    };
+                }
+                // Data Rows Styling
+                else {
+                    cell.font = { name: "Arial", size: 10 };
+                    cell.border = {
+                        top: { style: "thin", color: { argb: "E5E7EB" } },
+                        bottom: { style: "thin", color: { argb: "E5E7EB" } },
+                        left: { style: "thin", color: { argb: "E5E7EB" } },
+                        right: { style: "thin", color: { argb: "E5E7EB" } }
+                    };
+                }
+            });
+        });
+
+        // 6. Generate Buffer & Download File
+        const timestamp = new Date().toISOString().split("T")[0];
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        });
+        saveAs(blob, `${timestamp}_Loading_Efficiency.xlsx`);
+    };
     return (
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-4">
             {/* Header Module */}
@@ -23,12 +119,9 @@ const LoadingLog = ({ loadingLogs }) => {
                         </span>
                     </div>
                     <div className="text-xs font-mono font-bold text-slate-100 bg-emerald-600 border border-slate-200 rounded px-2.5 py-1.5 self-start sm:self-auto shrink-0">
-                        {/* <button onClick={handleExportToExcel}>
+                        <button onClick={handleExportToExcel}>
                             Export as Excel
-                        </button> */}
-                    </div>
-                    <div className="text-xs font-mono font-bold text-slate-100 bg-red-600 border border-slate-200 rounded px-2.5 py-1.5 self-start sm:self-auto shrink-0">
-                        {/* <button onClick={hanldleReset}>Reset</button> */}
+                        </button>
                     </div>
                 </div>
             </div>

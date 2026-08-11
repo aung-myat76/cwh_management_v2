@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import TruckList from "../components/TruckList";
 import cn from "../lib/cn";
 
-const Loading = ({ trucks, loading, updateCondition, updateLog }) => {
+const Loading = ({
+    trucks,
+    loading,
+    updateCondition,
+    updateLog,
+    updateTruck
+}) => {
     const [state, setState] = useState("All");
     const stateChangeCls = cn("p-2 rounded-md text-[10px] font-bold");
 
@@ -98,6 +104,7 @@ const Loading = ({ trucks, loading, updateCondition, updateLog }) => {
                     trucks={trucks}
                     state={state}
                     updateLog={updateLog}
+                    updateTruck={updateTruck}
                     updateCondition={updateCondition}
                 />
             )}
