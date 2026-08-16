@@ -73,10 +73,13 @@ const App = () => {
                 updatedTruck["logId"] = newLog.data[0].id;
                 return updatedTrucks;
             });
+
             setLogs((preLogs) => {
-                const updatedLogs = preLogs.length > 0 ? [...preLogs] : [];
-                console.log(newLog.data);
-                updatedLogs.push(newLog.data[0]);
+                const updatedLogs = [...preLogs];
+
+                if (!newLog.data[0].id) {
+                    updatedLogs.push(newLog.data[0]);
+                }
                 return updatedLogs;
             });
 
@@ -84,7 +87,7 @@ const App = () => {
                 .from("trucks")
                 .update({ ...newState, logId: newLog.data[0].id })
                 .eq("id", id);
-        } else if (newState.logId) {
+        } else if (newState.logId && newState.condition === "Loaded") {
             console.log("exist");
             const { data } = await supabase
                 .from("loading-log")
@@ -131,7 +134,7 @@ const App = () => {
             });
 
             setLogs((preLogs) => {
-                const updatedLogs = preLogs.length > 0 ? [...preLogs] : [];
+                const updatedLogs = [...preLogs];
                 const selectedLog = updatedLogs.find(
                     (l) => l.id === newState.logId
                 );
