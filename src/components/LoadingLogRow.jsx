@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
 import calculateDuration from "../lib/calculateDuration";
+import { supabase } from "../superbaseClient";
 
-const LoadingLogRow = ({ log, index }) => {
+const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
     // const { loadingLogs } = useAppState();
     // const dispatch = useAppDispatch();
     // const [isEditLoading, setIsEditLoading] = useState(false);
@@ -15,58 +16,49 @@ const LoadingLogRow = ({ log, index }) => {
     const startTimeRef = useRef();
     const finishTimeRef = useRef();
 
-    // const hanldeEditLog = (log: LoadingLogType): void => {
-    //     const updatedLog = loadingLogs.find((l) => l._id === log._id);
-    //     updatedLog.truckNo = truckNoRef.current?.value || updatedLog.truckNo;
-    //     updatedLog!.truckType =
-    //         truckTypeRef.current?.value || updatedLog!.truckType;
-    //     updatedLog!.distributor =
-    //         distributorRef.current?.value || updatedLog!.distributor;
-    //     updatedLog!.startTime =
-    //         new Date().setHours(
-    //             +startTimeRef.current!.value.split(":")[0],
-    //             +startTimeRef.current!.value.split(":")[1]
-    //         ) || updatedLog!.startTime;
-    //     updatedLog!.finishTime =
-    //         new Date().setHours(
-    //             +finishTimeRef.current!.value.split(":")[0],
-    //             +finishTimeRef.current!.value.split(":")[1]
-    //         ) || updatedLog!.finishTime;
-    //     if (!updatedLog) return;
-    //     setIsEditLoading(true);
-    //     socket.emit("c:log:updated", updatedLog, (res) => {
-    //         if (res.success && res.data) {
-    //             dispatch({
-    //                 type: "UPDATE_LOADINGLOG",
-    //                 payload: {
-    //                     updatedLoadingLog: res.data
-    //                 }
-    //             });
-    //         }
-    //         setIsEditLoading(false);
-    //     });
-    // };
+    const [isEditLoading, setIsEditLoading] = useState(false);
+    const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
-    // const handleDeleteLog = (logId: string) => {
-    //     setIsDeleteLoading(true);
-    //     socket.emit("c:log:deleted", logId, (res) => {
-    //         if (res.success && res.data) {
-    //             dispatch({
-    //                 type: "DELETE_LOADINGLOG",
-    //                 payload: { loadingLogId: res.data }
-    //             });
-    //             dispatch({
-    //                 type: "DELETE_TRUCKCONDITION",
-    //                 payload: {
-    //                     logId: res.data
-    //                 }
-    //             });
-    //         } else if (!res.success) {
-    //             console.log(res.error);
-    //         }
-    //         setIsDeleteLoading(false);
-    //     });
-    // };
+    const hanldeEditLog = async () => {
+        // const updatedLog = loadingLogs.find((l) => l._id === log._id);
+        const updatedLog = { ...log };
+        updatedLog.truck_no = truckNoRef.current?.value || updatedLog.truck_no;
+        updatedLog.type = truckTypeRef.current?.value || updatedLog.type;
+        updatedLog.distributor =
+            distributorRef.current?.value || updatedLog.distributor;
+        updatedLog.wh_or_sale =
+            destinationRef.current?.value || updatedLog.wh_or_sale;
+        updatedLog.start_time =
+            new Date().setHours(
+                +startTimeRef.current.value.split(":")[0],
+                +startTimeRef.current.value.split(":")[1]
+            ) || updatedLog.start_time;
+        updatedLog.finish_time =
+            new Date().setHours(
+                +finishTimeRef.current.value.split(":")[0],
+                +finishTimeRef.current.value.split(":")[1]
+            ) || updatedLog.finish_time;
+        updateLog(updatedLog.id, updatedLog);
+        setIsEditLoading(true);
+        console.log(updatedLog);
+        const res = await supabase
+            .from("loading-log")
+            .update({ ...updatedLog })
+            .eq("id", updatedLog.id);
+        setIsEditLoading(false);
+    };
+
+    const handleDeleteLog = async () => {
+        if (confirm(`Are you sure to delete truck no - ${log.truck_no} ?`)) {
+            setIsDeleteLoading(true);
+            deleteLog(log.id);
+            const res = await supabase
+                .from("loading-log")
+                .delete()
+                .eq("id", log.id);
+            setIsDeleteLoading(false);
+        }
+    };
 
     return (
         <tr
@@ -74,7 +66,7 @@ const LoadingLogRow = ({ log, index }) => {
             className="divide-x divide-slate-200 hover:bg-slate-50/70 transition-colors">
             {/* Row Index Indicator Counter */}
             <td className="py-2 px-3 font-bold text-center text-slate-400 bg-slate-50/50 select-none">
-                {index}
+                {index + 1}
             </td>
 
             {/* Truck Number Data */}
@@ -82,9 +74,10 @@ const LoadingLogRow = ({ log, index }) => {
                 <input
                     ref={truckNoRef}
                     onChange={(e) =>
-                        (truckNoRef.current.value = e.target.value)
+                        (truckNoRef.current.value =
+                            e.target.value.toUpperCase())
                     }
-                    defaultValue={log.truck_no || "-"}
+                    defaultValue={log.truck_no.toUpperCase() || "-"}
                     type="text"
                 />
             </td>
@@ -175,21 +168,21 @@ const LoadingLogRow = ({ log, index }) => {
                 className={`py-2 px-4 font-bold tracking-tight whitespace-nowrap ${isComplete ? "text-slate-800" : "text-red-500 animate-pulse"}`}>
                 {calculateDuration(log.start_time, log.finish_time)}
             </td> */}
-            {/* <td
+            <td
                 className={`flex gap-2 items-center py-2 px-4 font-bold tracking-tight whitespace-nowrap `}>
                 <button
                     disabled={isEditLoading}
                     className="px-2 py-1 rounded-sm bg-blue-800 text-white"
-                    onClick={() => hanldeEditLog(log)}>
-                    {isEditLoading ? "Update..." : "Update"}
+                    onClick={() => hanldeEditLog()}>
+                    {isEditLoading ? "Updating..." : "Update"}
                 </button>
                 <button
                     disabled={isDeleteLoading}
                     className="px-2 py-1 rounded-sm bg-red-800 text-white"
-                    onClick={() => handleDeleteLog(log._id)}>
-                    {isDeleteLoading ? "Delete..." : "Delete"}
+                    onClick={() => handleDeleteLog()}>
+                    {isDeleteLoading ? "Deleting..." : "Delete"}
                 </button>
-            </td> */}
+            </td>
 
             {/* Compact Excel Status Pill Box */}
         </tr>

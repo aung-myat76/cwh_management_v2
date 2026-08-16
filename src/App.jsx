@@ -358,6 +358,13 @@ const App = () => {
             return updatedLogs;
         });
     };
+
+    const deleteLog = (id) => {
+        setLogs((preLogs) => {
+            const updatedLogs = [...preLogs];
+            return updatedLogs.filter((l) => l.id !== id);
+        });
+    };
     const updateTruck = (id, updatedTruck) => {
         console.log(updatedTruck);
         setTrucks((preTrucks) => {
@@ -430,7 +437,13 @@ const App = () => {
                 />
                 <Route
                     path="/loading-log"
-                    element={<LoadingLog loadingLogs={logs} />}
+                    element={
+                        <LoadingLog
+                            loadingLogs={logs}
+                            updateLog={updateLog}
+                            deleteLog={deleteLog}
+                        />
+                    }
                 />
                 <Route
                     path="/packaging"

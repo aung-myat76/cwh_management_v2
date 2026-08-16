@@ -4,7 +4,7 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import calculateDuration from "../lib/calculateDuration";
 
-const LoadingLog = ({ loadingLogs }) => {
+const LoadingLog = ({ loadingLogs, updateLog, deleteLog }) => {
     console.log(loadingLogs);
 
     const handleExportToExcel = async () => {
@@ -171,7 +171,9 @@ const LoadingLog = ({ loadingLogs }) => {
                                         <LoadingLogRow
                                             key={log.id}
                                             log={log}
-                                            index={index + 1}
+                                            index={index}
+                                            updateLog={updateLog}
+                                            deleteLog={deleteLog}
                                         />
                                     );
                                 })

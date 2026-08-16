@@ -104,6 +104,7 @@ const Modal = ({
                         <div className="flex gap-2">
                             <input
                                 ref={truckRef}
+                                maxLength={7}
                                 defaultValue={truckNo}
                                 placeholder={
                                     !truckNo
