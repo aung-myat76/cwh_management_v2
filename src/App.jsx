@@ -87,7 +87,7 @@ const App = () => {
                 .from("trucks")
                 .update({ ...newState, logId: newLog.data[0].id })
                 .eq("id", id);
-        } else if (newState.logId && newState.condition === "Loaded") {
+        } else if (newState.logId) {
             console.log("exist");
             const { data } = await supabase
                 .from("loading-log")
@@ -178,6 +178,7 @@ const App = () => {
         const lastTime = Math.max(...TTimes, ...LTimes);
 
         const date = new Date(lastTime);
+        console.log(lastTime, date);
         const dateString = date.toLocaleTimeString("en-GB", {
             hour: "2-digit",
             minute: "2-digit",
