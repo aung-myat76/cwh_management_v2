@@ -48,7 +48,7 @@ const App = () => {
                         loading_bay: newState.loading_bay,
                         distributor: newState.distributor,
                         wh_or_sale: newState.wh_or_sale,
-                        start_time: new Date().getTime(),
+                        start_time: new Date(),
                         finish_time: null,
                         remark: null
                     }
@@ -97,7 +97,7 @@ const App = () => {
                 .from("loading-log")
                 .update({
                     ...data[0],
-                    finish_time: new Date().getTime()
+                    finish_time: new Date()
                 })
                 .eq("id", newState.logId);
             let truck = { ...newState };

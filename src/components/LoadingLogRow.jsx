@@ -79,7 +79,9 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                         (truckNoRef.current.value =
                             e.target.value.toUpperCase())
                     }
-                    defaultValue={log.truck_no.toUpperCase() || "-"}
+                    defaultValue={
+                        log.truck_no ? log.truck_no.toUpperCase() : "-"
+                    }
                     type="text"
                 />
             </td>
