@@ -223,9 +223,7 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
             <td className="py-2 px-3 font-bold text-center text-slate-400 bg-slate-50/50 select-none">
                 <input
                     ref={remarkRef}
-                    onChange={(e) =>
-                        (remarkRef.current.value = e.target.value.toUpperCase())
-                    }
+                    onChange={(e) => (remarkRef.current.value = e.target.value)}
                     defaultValue={log.remark || ""}
                     type="text"
                 />
