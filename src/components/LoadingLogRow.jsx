@@ -15,6 +15,7 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
     const destinationRef = useRef();
     const startTimeRef = useRef();
     const finishTimeRef = useRef();
+    const remarkRef = useRef();
 
     const [isEditLoading, setIsEditLoading] = useState(false);
     const [isDeleteLoading, setIsDeleteLoading] = useState(false);
@@ -38,6 +39,7 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                 +finishTimeRef.current.value.split(":")[0],
                 +finishTimeRef.current.value.split(":")[1]
             ) || updatedLog.finish_time;
+        updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
         updateLog(updatedLog.id, updatedLog);
         setIsEditLoading(true);
         console.log(updatedLog);
@@ -217,6 +219,16 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
             </td>
             <td className="py-2 px-3 font-bold text-center text-slate-400 bg-slate-50/50 select-none">
                 {log.loading_bay}
+            </td>
+            <td className="py-2 px-3 font-bold text-center text-slate-400 bg-slate-50/50 select-none">
+                <input
+                    ref={remarkRef}
+                    onChange={(e) =>
+                        (remarkRef.current.value = e.target.value.toUpperCase())
+                    }
+                    defaultValue={log.remark || ""}
+                    type="text"
+                />
             </td>
 
             {/* Calculated Total Operational Running Duration */}

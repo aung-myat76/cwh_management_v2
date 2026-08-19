@@ -355,6 +355,8 @@ const App = () => {
             selectedLog.type = updatedLog.type;
             selectedLog.distributor = updatedLog.distributor;
             selectedLog.wh_or_sale = updatedLog.wh_or_sale;
+            selectedLog.remark = updatedLog.remark;
+
             return updatedLogs;
         });
     };

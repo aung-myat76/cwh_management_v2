@@ -160,6 +160,12 @@ const LoadingLog = ({ loadingLogs, updateLog, deleteLog }) => {
                                 <th className="py-2.5 px-4 min-w-[120px] ">
                                     Loading Bay
                                 </th>
+                                <th className="py-2.5 px-4 min-w-[120px] ">
+                                    Remark
+                                </th>
+                                <th className="py-2.5 px-4 min-w-[120px] ">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
 
