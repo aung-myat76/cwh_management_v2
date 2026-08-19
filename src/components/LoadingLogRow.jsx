@@ -100,7 +100,8 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                         (truckTypeRef.current.value = e.target.value)
                     }
                     placeholder={!log.type ? "N/A" : log.type}
-                    className="p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none">
+                    // className="p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none"
+                >
                     <option value={""}>Type</option>
                     <option value={"6"}>6</option>
                     <option value={"10"}>10</option>
@@ -127,10 +128,9 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                         (distributorRef.current.value = e.target.value)
                     }
                     defaultValue={log.distributor}
-                    placeholder={
-                        !log.distributor ? "Distributor" : log.distributor
-                    }
-                    className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none">
+                    placeholder={!log.distributor ? "-" : log.distributor}
+                    // className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none"
+                >
                     <option value={""}>Distributor</option>
                     <option value={"MBL"}>MBL</option>
                     <option value={"Nehru"}>Nehru</option>
@@ -142,8 +142,8 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                     <option value={"YCO"}>YCO</option>
                     <option value={"K-Kan"}>K-Kan</option>
                     <option value={"NMMK"}>NMMK</option>
-                    <option value={"N-Star"}>N-Star</option>
                     <option value={"T-Party"}>T-Party</option>
+                    <option value={"N-Star"}>N-Star</option>
                     <option value={"Other"}>Other</option>
                 </select>
             </td>
@@ -163,8 +163,9 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                         (destinationRef.current.value = e.target.value)
                     }
                     defaultValue={log.wh_or_sale}
-                    placeholder={!log.wh_or_sale ? "WH/Sale" : log.wh_or_sale}
-                    className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none">
+                    placeholder={!log.wh_or_sale ? "-" : log.wh_or_sale}
+                    // className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none"
+                >
                     <option value={""}>WH/Sale</option>
                     <option value={"WH-WH"}>WH-WH</option>
                     <option value={"Sale"}>Sale</option>
