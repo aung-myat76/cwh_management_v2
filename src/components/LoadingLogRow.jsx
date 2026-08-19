@@ -84,36 +84,91 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
 
             {/* Truck Type Classification */}
             <td className="py-2 px-4 text-slate-600">
-                <input
+                {/* <input
                     ref={truckTypeRef}
                     onChange={(e) =>
                         (truckTypeRef.current.value = e.target.value)
                     }
                     defaultValue={log.type ? `${log.type}` : "N/A"}
                     type="text"
-                />
+                /> */}
+                <select
+                    name="types"
+                    ref={truckTypeRef}
+                    defaultValue={log.type}
+                    onChange={(e) =>
+                        (truckTypeRef.current.value = e.target.value)
+                    }
+                    placeholder={!log.type ? "N/A" : log.type}
+                    className="p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none">
+                    <option value={""}>Type</option>
+                    <option value={"6"}>6</option>
+                    <option value={"10"}>10</option>
+                    <option value={"12"}>12</option>
+                    <option value={"20"}>20</option>
+                    <option value={"22"}>22</option>
+                </select>
             </td>
 
             {/* Distributor / Cargo Handler Info */}
             <td className="py-2 px-4 text-slate-600 truncate max-w-[220px] font-sans font-medium">
-                <input
+                {/* <input
                     ref={distributorRef}
                     onChange={(e) =>
                         (distributorRef.current.value = e.target.value)
                     }
                     defaultValue={log.distributor || "—"}
                     type="text"
-                />
+                /> */}
+                <select
+                    name="distributors"
+                    ref={distributorRef}
+                    onChange={(e) =>
+                        (distributorRef.current.value = e.target.value)
+                    }
+                    defaultValue={log.distributor}
+                    placeholder={
+                        !log.distributor ? "Distributor" : log.distributor
+                    }
+                    className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none">
+                    <option value={""}>Distributor</option>
+                    <option value={"MBL"}>MBL</option>
+                    <option value={"Nehru"}>Nehru</option>
+                    <option value={"TPN"}>TPN</option>
+                    <option value={"STC"}>STC</option>
+                    <option value={"KG"}>KG</option>
+                    <option value={"KKA"}>KKA</option>
+                    <option value={"BDL"}>BDL</option>
+                    <option value={"YCO"}>YCO</option>
+                    <option value={"K-Kan"}>K-Kan</option>
+                    <option value={"NMMK"}>NMMK</option>
+                    <option value={"N-Star"}>N-Star</option>
+                    <option value={"T-Party"}>T-Party</option>
+                    <option value={"Other"}>Other</option>
+                </select>
             </td>
             <td className="py-2 px-4 text-slate-600 truncate max-w-[220px] font-sans font-medium">
-                <input
+                {/* <input
                     ref={destinationRef}
                     onChange={(e) =>
                         (destinationRef.current.value = e.target.value)
                     }
                     defaultValue={log.wh_or_sale || "—"}
                     type="text"
-                />
+                /> */}
+                <select
+                    name="wh_or_sale"
+                    ref={destinationRef}
+                    onChange={(e) =>
+                        (destinationRef.current.value = e.target.value)
+                    }
+                    defaultValue={log.wh_or_sale}
+                    placeholder={!log.wh_or_sale ? "WH/Sale" : log.wh_or_sale}
+                    className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none">
+                    <option value={""}>WH/Sale</option>
+                    <option value={"WH-WH"}>WH-WH</option>
+                    <option value={"Sale"}>Sale</option>
+                </select>
             </td>
 
             {/* Clock-In Log Timestamp */}

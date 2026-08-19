@@ -10,11 +10,13 @@ const Loading = ({
     updateTruck
 }) => {
     const [state, setState] = useState("All");
-    const stateChangeCls = cn("p-2 rounded-md text-[10px] font-bold");
+    const stateChangeCls = cn(
+        "p-2 min-h-full rounded-md text-[.6rem] font-bold"
+    );
 
     return (
         <div>
-            <ul className="flex gap-1 justify-center my-3 text-white ">
+            <ul className="flex justify-center gap-1  my-3 text-white ">
                 <li>
                     <button
                         onClick={() => setState("All")}
