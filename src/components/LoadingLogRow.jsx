@@ -30,15 +30,19 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
         updatedLog.wh_or_sale =
             destinationRef.current?.value || updatedLog.wh_or_sale;
         updatedLog.start_time =
-            new Date().setHours(
-                +startTimeRef.current.value.split(":")[0],
-                +startTimeRef.current.value.split(":")[1]
-            ) || updatedLog.start_time;
+            new Date(
+                new Date(updatedLog.start_time).setHours(
+                    +startTimeRef.current.value.split(":")[0],
+                    +startTimeRef.current.value.split(":")[1]
+                )
+            ).toISOString() || updatedLog.start_time;
         updatedLog.finish_time =
-            new Date().setHours(
-                +finishTimeRef.current.value.split(":")[0],
-                +finishTimeRef.current.value.split(":")[1]
-            ) || updatedLog.finish_time;
+            new Date(
+                new Date(updatedLog.finish_time).setHours(
+                    +finishTimeRef.current.value.split(":")[0],
+                    +finishTimeRef.current.value.split(":")[1]
+                )
+            ).toISOString() || updatedLog.finish_time;
         updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
         updateLog(updatedLog.id, updatedLog);
         setIsEditLoading(true);
@@ -170,7 +174,7 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                     placeholder={!log.wh_or_sale ? "-" : log.wh_or_sale}
                     // className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none"
                 >
-                    <option value={""}>WH/Sale</option>
+                    <option value={""}>Destination</option>
                     <option value={"WH-WH"}>WH-WH</option>
                     <option value={"Sale"}>Sale</option>
                 </select>
