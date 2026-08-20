@@ -3,9 +3,31 @@ import LoadingLogRow from "../components/LoadingLogRow";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import calculateDuration from "../lib/calculateDuration";
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "../superbaseClient";
+import getByDate from "../lib/getByDate";
 
-const LoadingLog = ({ loadingLogs, updateLog, deleteLog }) => {
-    console.log(loadingLogs);
+const LoadingLog = ({ logs, updateLog, deleteLog }) => {
+    const [loadingLogs, setLoadingLogs] = useState([]);
+
+    useEffect(() => {
+        setLoadingLogs(logs);
+    }, [logs]);
+
+    const dateRef = useRef();
+
+    const fetchByDate = async (date) => {
+        console.log(date);
+        const res = await supabase
+            .from("loading-log")
+            .select("*")
+            .gte("created_at", getByDate(date).startOfDay)
+            .lt("created_at", getByDate(date).endOfDay);
+        setLoadingLogs(res.data);
+        console.log(res);
+    };
+
+    console.log(loadingLogs, logs);
 
     const handleExportToExcel = async () => {
         if (!confirm("Are you sure to export as an Excel file?")) return;
@@ -102,10 +124,20 @@ const LoadingLog = ({ loadingLogs, updateLog, deleteLog }) => {
         <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-4">
             {/* Header Module */}
             <div className="bg-white border border-slate-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg shadow-2xs">
-                <div>
+                <div className="flex gap-2 items-center mb-2">
                     <h2 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
                         <span>📊</span> Loading Efficiency
                     </h2>
+                    <div className="text-xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 self-start sm:self-auto shrink-0">
+                        <input
+                            ref={dateRef}
+                            onChange={(e) => fetchByDate(e.target.value)}
+                            type="date"
+                            defaultValue={
+                                new Date().toISOString().split("T")[0]
+                            }
+                        />
+                    </div>
                     {/* <p className="text-xs text-slate-400 mt-0.5">
                         Historical workflow table tracking truck assignments and
                         precise timestamp benchmarks.
@@ -118,6 +150,7 @@ const LoadingLog = ({ loadingLogs, updateLog, deleteLog }) => {
                             {loadingLogs.length}
                         </span>
                     </div>
+
                     <div className="text-xs font-mono font-bold text-slate-100 bg-emerald-600 border border-slate-200 rounded px-2.5 py-1.5 self-start sm:self-auto shrink-0">
                         <button onClick={handleExportToExcel}>
                             Export as Excel

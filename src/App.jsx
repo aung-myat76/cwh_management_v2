@@ -10,6 +10,7 @@ import MainLayout from "./layout/MainLayout";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Loading from "./pages/Loading";
 import LoadingLog from "./pages/LoadingLog";
+import getByDate from "./lib/getByDate";
 
 // const getShift = () => {
 //     const time = now.getHours();
@@ -26,6 +27,7 @@ const App = () => {
     const [lines, setLines] = useState([]);
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(false);
+    // const [date, setDate] = useState(new Date());
 
     // const [isOpen, setIsOpen] = useState(false);
 
@@ -99,7 +101,8 @@ const App = () => {
                     ...data[0],
                     finish_time: new Date()
                 })
-                .eq("id", newState.logId);
+                .eq("id", newState.logId)
+                .select();
             let truck = { ...newState };
 
             if (
@@ -138,9 +141,9 @@ const App = () => {
                 const selectedLog = updatedLogs.find(
                     (l) => l.id === newState.logId
                 );
-                console.log(selectedLog);
+                console.log(selectedLog, updatedLog);
                 if (selectedLog) {
-                    selectedLog.finish_time = updatedLog.finish_time;
+                    selectedLog.finish_time = updatedLog.data[0].finish_time;
                 }
                 return updatedLogs;
             });
@@ -188,6 +191,10 @@ const App = () => {
 
         return dateString;
     };
+
+    // const updateDate = (date) => {
+    //     setDate(date);
+    // };
 
     // useEffect(() => {
     //     const getData = async () => {
@@ -244,6 +251,10 @@ const App = () => {
     //     return () => supabase.removeChannel(unsubscribe);
     // }, []);
     useEffect(() => {
+        const date = new Date();
+        const start = getByDate(date).startOfDay;
+        const end = getByDate(date).endOfDay;
+        console.log(start, end);
         const getData = async () => {
             // const data = await databases.listDocuments(dbId, collectionId);
 
@@ -255,10 +266,13 @@ const App = () => {
                 supabase
                     .from("packaging")
                     .select("*")
+
                     .order("id", { ascending: true }),
                 supabase
                     .from("loading-log")
                     .select("*")
+                    .gte("created_at", start)
+                    .lt("created_at", end)
                     .order("id", { ascending: true })
             ]);
             if (truckRes.data) setTrucks(truckRes.data);
@@ -441,7 +455,7 @@ const App = () => {
                     path="/loading-log"
                     element={
                         <LoadingLog
-                            loadingLogs={logs}
+                            logs={logs}
                             updateLog={updateLog}
                             deleteLog={deleteLog}
                         />
