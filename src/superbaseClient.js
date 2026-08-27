@@ -1,8 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 
 // const supabaseUrl = "https://llcbrnpthatrqpltnqwt.supabase.co";
-// const workerUrl = "https://cwh-management.kaung762389.workers.dev";
-const vercelUrl = "https://cwh-management-v2.vercel.app/supabase-api";
+const workerUrl = "https://cwh-management.kaung762389.workers.dev";
+// const vercelUrl = "https://cwh-management-v2.vercel.app/supabase-api";
 const supabaseAnonKey = "sb_publishable__rdCpUrZUPQLm6CJ1femZQ_g-4Sx0KC";
 
-export const supabase = createClient(vercelUrl, supabaseAnonKey);
+export const supabase = createClient(workerUrl, supabaseAnonKey);
