@@ -9,7 +9,7 @@ const TruckList = ({
 }) => {
     const filterTrucks =
         state === "All" ? trucks : trucks.filter((t) => t.condition === state);
-
+    console.log(trucks);
     return (
         <ul className="flex items-center justify-center gap-3 flex-wrap md:w-2/4 mx-auto">
             {filterTrucks.length <= 0 && state !== "All" && (
@@ -23,8 +23,8 @@ const TruckList = ({
                 filterTrucks.map((truck) => {
                     return (
                         <Truck
-                            key={truck.id}
-                            id={truck.id}
+                            key={truck.$id}
+                            id={truck.$id}
                             loadingBay={truck["loading_bay"]}
                             condition={truck["condition"]}
                             truckNo={truck["truck_no"]}
