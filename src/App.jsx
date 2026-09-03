@@ -12,7 +12,7 @@ import Loading from "./pages/Loading";
 import LoadingLog from "./pages/LoadingLog";
 // import getByDate from "./lib/getByDate";
 import { databases, realtime } from "./lib/appwriteClient";
-import { ID } from "appwrite";
+import { ID, Query } from "appwrite";
 // import { cleanDocument } from "./lib/cleanDocument";
 
 // const getShift = () => {
@@ -106,7 +106,7 @@ const App = () => {
                 dbId,
                 collections.loading,
                 id,
-                { logId: newLog.$id }
+                { ...newState, logId: newLog.$id }
             );
         } else if (newState.logId) {
             console.log("exist");
@@ -132,11 +132,12 @@ const App = () => {
             //     .eq("id", newState.logId)
             //     .select();
             let truck = { ...newState };
-
+            console.log(newState.condition);
             if (
                 newState.condition === "Free" ||
                 newState.condition === "Blocked"
             ) {
+                console.log(99);
                 truck = {
                     ...newState,
                     condition: newState.condition,
@@ -169,12 +170,13 @@ const App = () => {
                 const selectedLog = updatedLogs.find(
                     (l) => l.$id === newState.logId
                 );
-                console.log(selectedLog, updatedLog);
+                // console.log(selectedLog, updatedLog);
                 if (selectedLog) {
                     selectedLog.finish_time = updatedLog.finish_time;
                 }
                 return updatedLogs;
             });
+            console.log(truck);
 
             return await databases.updateDocument(
                 dbId,
@@ -402,7 +404,7 @@ const App = () => {
     // const channel = `databases.${dbId}.collections.*.documents`;
     const updateCollectionState = (list, events, payload) => {
         // 1. CREATE
-        console.log(events, payload);
+        // console.log(events, payload);
         if (events.some((e) => e.endsWith(".create"))) {
             // Avoid duplicates if the item was already added locally
             if (list.some((item) => item.$id === payload.$id)) return list;
@@ -411,7 +413,7 @@ const App = () => {
 
         // 2. UPDATE
         if (events.some((e) => e.endsWith(".update"))) {
-            console.log(payload);
+            // console.log(payload);
             return list.map((item) =>
                 item.$id === payload.$id ? payload : item
             );
@@ -434,7 +436,7 @@ const App = () => {
                     databases.listDocuments(dbId, "loading-logs")
                 ];
                 const [trucks, packaging, logs] = await Promise.all(prom);
-                console.log(trucks);
+                // console.log(trucks);
                 setTrucks([...trucks.documents].reverse());
                 setLines(packaging.documents);
                 setLogs(logs.documents);
@@ -456,7 +458,7 @@ const App = () => {
             const { events, payload, channels } = res;
             // console.log(res, "this is res");
             // console.log(events, payload, eventChannels, channels);
-            console.log(events.some((e) => e.includes("collections.loading")));
+            // console.log(events.some((e) => e.includes("collections.loading")));
             if (events.some((e) => e.includes("collections.loading"))) {
                 setTrucks((prev) =>
                     updateCollectionState(prev, events, payload)
@@ -515,8 +517,49 @@ const App = () => {
     };
 
     const handleReset = async () => {
-        // setLoading(true);
-
+        try {
+            setLoading(true);
+            const defaultTruck = {
+                truck_no: null,
+                type: null,
+                distributor: null,
+                wh_or_sale: null,
+                logId: null,
+                condition: "Free"
+            };
+            const loadingRes = await databases.listDocuments(
+                dbId,
+                collections.loading,
+                [Query.select(["$id"])]
+            );
+            const loadingProm = loadingRes.documents.map((l) =>
+                databases.updateDocument(dbId, collections.loading, l.$id, {
+                    ...defaultTruck
+                })
+            );
+            const logRes = await databases.listDocuments(
+                dbId,
+                collections.loadingLogs,
+                [Query.select(["$id"])]
+            );
+            const logProm = logRes.documents.map((l) =>
+                databases.deleteDocument(dbId, collections.loadingLogs, l.$id)
+            );
+            const porms = [loadingProm, logProm];
+            const [loading, log] = await Promise.all(porms);
+            // if (loading && log)
+            console.log(loading, log);
+            setTrucks((preTrucks) => {
+                return [...preTrucks].map((t) => {
+                    return { ...t, ...defaultTruck };
+                });
+            });
+            setLogs([]);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
         // const [loading, log] = await Promise.all([
         //     supabase
         //         .from("trucks")
