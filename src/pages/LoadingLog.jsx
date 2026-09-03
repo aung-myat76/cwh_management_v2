@@ -17,14 +17,15 @@ const LoadingLog = ({ logs, updateLog, deleteLog }) => {
     const dateRef = useRef();
 
     const fetchByDate = async (date) => {
-        console.log(date);
-        const res = await supabase
-            .from("loading-log")
-            .select("*")
-            .gte("created_at", getByDate(date).startOfDay)
-            .lt("created_at", getByDate(date).endOfDay);
-        setLoadingLogs(res.data);
-        console.log(res);
+        // console.log(date);
+        // const res = await supabase
+        //     .from("loading-log")
+        //     .select("*")
+        //     .gte("created_at", getByDate(date).startOfDay)
+        //     .lt("created_at", getByDate(date).endOfDay);
+        // setLoadingLogs(res.data);
+        // console.log(res);
+        console.log("get by date");
     };
 
     console.log(loadingLogs, logs);
@@ -208,7 +209,8 @@ const LoadingLog = ({ logs, updateLog, deleteLog }) => {
                                 loadingLogs.map((log, index) => {
                                     return (
                                         <LoadingLogRow
-                                            key={log.id}
+                                            key={log.$id}
+                                            id={log.$id}
                                             log={log}
                                             index={index}
                                             updateLog={updateLog}

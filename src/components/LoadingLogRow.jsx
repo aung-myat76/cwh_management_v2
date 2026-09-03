@@ -1,8 +1,12 @@
 import { useRef, useState } from "react";
 import calculateDuration from "../lib/calculateDuration";
 import { supabase } from "../superbaseClient";
+import { databases } from "../lib/appwriteClient";
 
-const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
+// };
+const dbId = import.meta.env.VITE_APPWRITE_DB_ID;
+
+const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
     // const { loadingLogs } = useAppState();
     // const dispatch = useAppDispatch();
     // const [isEditLoading, setIsEditLoading] = useState(false);
@@ -44,24 +48,32 @@ const LoadingLogRow = ({ log, index, updateLog, deleteLog }) => {
                 )
             ).toISOString() || updatedLog.finish_time;
         updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
-        updateLog(updatedLog.id, updatedLog);
+        updateLog(updatedLog.$id, updatedLog);
         setIsEditLoading(true);
         console.log(updatedLog);
-        const res = await supabase
-            .from("loading-log")
-            .update({ ...updatedLog })
-            .eq("id", updatedLog.id);
+        // const res = await supabase
+        //     .from("loading-log")
+        //     .update({ ...updatedLog })
+        //     .eq("id", updatedLog.id);
+        const res = await databases.updateDocument(dbId, "loading-logs", id, {
+            ...updateLog
+        });
         setIsEditLoading(false);
     };
 
     const handleDeleteLog = async () => {
         if (confirm(`Are you sure to delete truck no - ${log.truck_no} ?`)) {
             setIsDeleteLoading(true);
-            deleteLog(log.id);
-            const res = await supabase
-                .from("loading-log")
-                .delete()
-                .eq("id", log.id);
+            deleteLog(id);
+            // const res = await supabase
+            //     .from("loading-log")
+            //     .delete()
+            //     .eq("id", log.id);
+            const res = await databases.deleteDocument(
+                dbId,
+                "loading-logs",
+                id
+            );
             setIsDeleteLoading(false);
         }
     };

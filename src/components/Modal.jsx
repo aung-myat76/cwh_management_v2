@@ -1,6 +1,7 @@
 import ReactDom from "react-dom";
 import { useRef } from "react";
 import { supabase } from "../superbaseClient";
+import { databases } from "../lib/appwriteClient";
 
 const Modal = ({
     id,
@@ -39,44 +40,68 @@ const Modal = ({
         // await databases.updateDocument(dbId, collectionId, id, {
         //     truck_no: truckRef.current.value || '-'
         // });
-        const { data } = await supabase.from("trucks").select().eq("id", id);
-        const updatedTruck = await supabase
-            .from("trucks")
-            .update({
-                ...data[0],
+        // const { data } = await supabase.from("trucks").select().eq("id", id);
+        // const updatedTruck = await supabase
+        //     .from("trucks")
+        //     .update({
+        //         ...data[0],
+        //         truck_no: truckRef.current.value || null,
+        //         type: typeRef.current.value || null,
+        //         wh_or_sale: whOrSaleRef.current.value || null,
+        //         distributor: distributorRef.current.value || null,
+        //         logId: logId
+        //     })
+        //     .eq("id", id)
+        //     .select();
+        const updatedTruck = await databases.updateDocument(
+            import.meta.env.VITE_APPWRITE_DB_ID,
+            "loading",
+            id,
+            {
                 truck_no: truckRef.current.value || null,
                 type: typeRef.current.value || null,
                 wh_or_sale: whOrSaleRef.current.value || null,
                 distributor: distributorRef.current.value || null,
                 logId: logId
-            })
-            .eq("id", id)
-            .select();
-        if (updatedTruck.data[0]) {
-            updateTruck(id, { ...updatedTruck.data[0] });
+            }
+        );
+        if (updatedTruck) {
+            updateTruck(id, { ...updatedTruck });
         }
-        console.log(data, updatedTruck);
+        console.log(updatedTruck);
 
         if (logId) {
-            const { data } = await supabase
-                .from("loading-log")
-                .select()
-                .eq("id", logId);
-            console.log(data);
-            const updatedLog = await supabase
-                .from("loading-log")
-                .update({
-                    ...data[0],
+            // const { data } = await supabase
+            //     .from("loading-log")
+            //     .select()
+            //     .eq("id", logId);
+            // console.log(data);
+            // const updatedLog = await supabase
+            //     .from("loading-log")
+            //     .update({
+            //         ...data[0],
+            //         truck_no: truckRef.current.value || null,
+            //         type: typeRef.current.value || null,
+            //         wh_or_sale: whOrSaleRef.current.value || null,
+            //         loading_bay: loadingBay,
+            //         distributor: distributorRef.current.value || null
+            //     })
+            //     .eq("id", logId)
+            //     .select();
+            const updatedLog = await databases.updateDocument(
+                import.meta.env.VITE_APPWRITE_DB_ID,
+                "loading-logs",
+                logId,
+                {
                     truck_no: truckRef.current.value || null,
                     type: typeRef.current.value || null,
                     wh_or_sale: whOrSaleRef.current.value || null,
                     loading_bay: loadingBay,
                     distributor: distributorRef.current.value || null
-                })
-                .eq("id", logId)
-                .select();
-            console.log(updatedLog.data);
-            updateLog(logId, { ...updatedLog.data[0] });
+                }
+            );
+            console.log(updatedLog);
+            updateLog(logId, { ...updatedLog });
         }
 
         onClose();

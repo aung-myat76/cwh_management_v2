@@ -2,6 +2,7 @@ import { useState } from "react";
 import cn from "../lib/cn";
 import Modal from "./Modal";
 import { supabase } from "../superbaseClient";
+import { databases } from "../lib/appwriteClient";
 
 const Truck = ({
     id,
@@ -32,17 +33,29 @@ const Truck = ({
             } else {
                 console.log(state);
                 if (state.logId) {
-                    const { data } = await supabase
-                        .from("loading-log")
-                        .update({
+                    // const { data } = await supabase
+                    //     .from("loading-log")
+                    //     .update({
+                    //         truck_no: state.truck_no,
+                    //         type: +state.type,
+                    //         distributor: state.distributor,
+                    //         wh_or_sale: state.wh_or_sale,
+                    //         loading_bay: loadingBay
+                    //     })
+                    //     .eq("id", state.logId)
+                    //     .select();
+                    const res = await databases.updateDocument(
+                        import.meta.env.VITE_APPWRITE_DB_ID,
+                        "loading-logs",
+                        state.logId,
+                        {
                             truck_no: state.truck_no,
-                            type: +state.type,
+                            type: state.type,
                             distributor: state.distributor,
                             wh_or_sale: state.wh_or_sale,
                             loading_bay: loadingBay
-                        })
-                        .eq("id", state.logId)
-                        .select();
+                        }
+                    );
                 }
 
                 // updateLog({ ...data[0] });

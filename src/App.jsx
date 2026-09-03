@@ -24,7 +24,7 @@ import { ID } from "appwrite";
 //         return "Night Shift";
 //     }
 // };
-const dbId = "6a950c240032e2dede18";
+const dbId = import.meta.env.VITE_APPWRITE_DB_ID;
 const collections = {
     loading: "loading",
     packaging: "packaging",
@@ -402,6 +402,7 @@ const App = () => {
     // const channel = `databases.${dbId}.collections.*.documents`;
     const updateCollectionState = (list, events, payload) => {
         // 1. CREATE
+        console.log(events, payload);
         if (events.some((e) => e.endsWith(".create"))) {
             // Avoid duplicates if the item was already added locally
             if (list.some((item) => item.$id === payload.$id)) return list;
@@ -434,7 +435,7 @@ const App = () => {
                 ];
                 const [trucks, packaging, logs] = await Promise.all(prom);
                 console.log(trucks);
-                setTrucks(trucks.documents.reverse());
+                setTrucks([...trucks.documents].reverse());
                 setLines(packaging.documents);
                 setLogs(logs.documents);
             } catch (err) {
@@ -452,16 +453,23 @@ const App = () => {
         ];
 
         const unsubscribe = realtime.subscribe(channels, (res) => {
-            const { events, payload, channels: eventChannels } = res;
-            if (eventChannels.includes(channels[0])) {
+            const { events, payload, channels } = res;
+            // console.log(res, "this is res");
+            // console.log(events, payload, eventChannels, channels);
+            console.log(events.some((e) => e.includes("collections.loading")));
+            if (events.some((e) => e.includes("collections.loading"))) {
                 setTrucks((prev) =>
                     updateCollectionState(prev, events, payload)
                 );
-            } else if (eventChannels.includes(channels[1])) {
+            } else if (
+                events.some((e) => e.includes("collections.packaging"))
+            ) {
                 setLines((prev) =>
                     updateCollectionState(prev, events, payload)
                 );
-            } else if (eventChannels.includes(channels[2])) {
+            } else if (
+                events.some((e) => e.includes("collections.loading-logs"))
+            ) {
                 setLogs((prev) => updateCollectionState(prev, events, payload));
             }
         });

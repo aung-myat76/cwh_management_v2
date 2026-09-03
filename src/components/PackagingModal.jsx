@@ -1,6 +1,7 @@
 import ReactDom from "react-dom";
 import { useRef } from "react";
 import { supabase } from "../superbaseClient";
+import { databases } from "../lib/appwriteClient";
 
 const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {
     const itemRef = useRef(null);
@@ -17,16 +18,23 @@ const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {
     };
 
     const handleUpdateLine = async () => {
-        // await databases.updateDocument(dbId, collectionId, id, {
-        //     truck_no: truckRef.current.value || '-'
-        // });
-        await supabase
-            .from("packaging")
-            .update({
+        await databases.updateDocument(
+            import.meta.env.VITE_APPWRITE_DB_ID,
+            "packaging",
+            id,
+            {
                 item: itemRef.current.value || null,
                 remark: remarkRef.current.value || null
-            })
-            .eq("id", id);
+            }
+        );
+        // await supabase
+        //     .from("packaging")
+        //     .update({
+        //         item: itemRef.current.value || null,
+        //         remark: remarkRef.current.value || null
+        //     })
+        //     .eq("id", id);
+
         onClose();
     };
 
