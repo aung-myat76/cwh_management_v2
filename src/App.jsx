@@ -13,6 +13,7 @@ import LoadingLog from "./pages/LoadingLog";
 // import getByDate from "./lib/getByDate";
 import { databases, realtime } from "./lib/appwriteClient";
 import { ID, Query } from "appwrite";
+import getByDate from "./lib/getByDate";
 // import { cleanDocument } from "./lib/cleanDocument";
 
 // const getShift = () => {
@@ -433,7 +434,16 @@ const App = () => {
                 const prom = [
                     databases.listDocuments(dbId, "loading"),
                     databases.listDocuments(dbId, "packaging"),
-                    databases.listDocuments(dbId, "loading-logs")
+                    databases.listDocuments(dbId, "loading-logs", [
+                        Query.greaterThanEqual(
+                            "$createdAt",
+                            getByDate(new Date()).startOfDay
+                        ),
+                        Query.lessThanEqual(
+                            "$createdAt",
+                            getByDate(new Date()).endOfDay
+                        )
+                    ])
                 ];
                 const [trucks, packaging, logs] = await Promise.all(prom);
                 // console.log(trucks);

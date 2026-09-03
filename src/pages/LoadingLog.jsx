@@ -6,6 +6,8 @@ import calculateDuration from "../lib/calculateDuration";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../superbaseClient";
 import getByDate from "../lib/getByDate";
+import { databases } from "../lib/appwriteClient";
+import { Query } from "appwrite";
 
 const LoadingLog = ({ logs, updateLog, deleteLog }) => {
     const [loadingLogs, setLoadingLogs] = useState([]);
@@ -17,14 +19,28 @@ const LoadingLog = ({ logs, updateLog, deleteLog }) => {
     const dateRef = useRef();
 
     const fetchByDate = async (date) => {
-        // console.log(date);
+        console.log(date);
+        const res = await databases.listDocuments(
+            import.meta.env.VITE_APPWRITE_DB_ID,
+            "loading-logs",
+            [
+                Query.greaterThanEqual(
+                    "$createdAt",
+                    getByDate(new Date(date)).startOfDay
+                ),
+                Query.lessThanEqual(
+                    "$createdAt",
+                    getByDate(new Date(date)).endOfDay
+                )
+            ]
+        );
         // const res = await supabase
         //     .from("loading-log")
         //     .select("*")
         //     .gte("created_at", getByDate(date).startOfDay)
         //     .lt("created_at", getByDate(date).endOfDay);
         // setLoadingLogs(res.data);
-        // console.log(res);
+        console.log(res);
         console.log("get by date");
     };
 
