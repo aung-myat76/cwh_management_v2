@@ -27,26 +27,29 @@ const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
     const hanldeEditLog = async () => {
         // const updatedLog = loadingLogs.find((l) => l._id === log._id);
         const updatedLog = { ...log };
+        console.log(startTimeRef.current.value, finishTimeRef.current.value);
         updatedLog.truck_no = truckNoRef.current?.value || updatedLog.truck_no;
         updatedLog.type = truckTypeRef.current?.value || updatedLog.type;
         updatedLog.distributor =
             distributorRef.current?.value || updatedLog.distributor;
         updatedLog.wh_or_sale =
             destinationRef.current?.value || updatedLog.wh_or_sale;
-        updatedLog.start_time =
-            new Date(
-                new Date(updatedLog.start_time).setHours(
-                    +startTimeRef.current.value.split(":")[0],
-                    +startTimeRef.current.value.split(":")[1]
-                )
-            ).toISOString() || updatedLog.start_time;
-        updatedLog.finish_time =
-            new Date(
-                new Date(updatedLog.finish_time).setHours(
-                    +finishTimeRef.current.value.split(":")[0],
-                    +finishTimeRef.current.value.split(":")[1]
-                )
-            ).toISOString() || updatedLog.finish_time;
+        updatedLog.start_time = startTimeRef.current.value
+            ? new Date(
+                  new Date(updatedLog.start_time).setHours(
+                      +startTimeRef.current.value.split(":")[0],
+                      +startTimeRef.current.value.split(":")[1]
+                  )
+              ).toISOString()
+            : updatedLog.start_time;
+        updatedLog.finish_time = finishTimeRef.current.value
+            ? new Date(
+                  new Date(updatedLog.finish_time).setHours(
+                      +finishTimeRef.current.value.split(":")[0],
+                      +finishTimeRef.current.value.split(":")[1]
+                  )
+              ).toISOString()
+            : updatedLog.finish_time;
         updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
         updateLog(id, updatedLog);
         setIsEditLoading(true);
