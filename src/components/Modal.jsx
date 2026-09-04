@@ -1,7 +1,8 @@
 import ReactDom from "react-dom";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { supabase } from "../superbaseClient";
 import { databases } from "../lib/appwriteClient";
+import { Spinner } from "./Spinner";
 
 const Modal = ({
     id,
@@ -21,19 +22,27 @@ const Modal = ({
     const typeRef = useRef(null);
     const distributorRef = useRef(null);
     const whOrSaleRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(false);
     if (!isOpen) return null;
 
     const handleSelect = async (state) => {
-        await cb({
-            condition: state,
-            truck_no: truckRef.current.value || null,
-            type: typeRef.current.value || null,
-            wh_or_sale: whOrSaleRef.current.value || null,
-            distributor: distributorRef.current.value || null,
-            loading_bay: loadingBay,
-            logId: logId
-        });
-        onClose();
+        try {
+            setIsLoading(true);
+            await cb({
+                condition: state,
+                truck_no: truckRef.current.value || null,
+                type: typeRef.current.value || null,
+                wh_or_sale: whOrSaleRef.current.value || null,
+                distributor: distributorRef.current.value || null,
+                loading_bay: loadingBay,
+                logId: logId
+            });
+            onClose();
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleUpdateTruck = async () => {
@@ -53,58 +62,65 @@ const Modal = ({
         //     })
         //     .eq("id", id)
         //     .select();
-        const updatedTruck = await databases.updateDocument(
-            import.meta.env.VITE_APPWRITE_DB_ID,
-            "loading",
-            id,
-            {
-                truck_no: truckRef.current.value || null,
-                type: typeRef.current.value || null,
-                wh_or_sale: whOrSaleRef.current.value || null,
-                distributor: distributorRef.current.value || null,
-                logId: logId
-            }
-        );
-        if (updatedTruck) {
-            updateTruck(id, { ...updatedTruck });
-        }
-        console.log(updatedTruck);
-
-        if (logId) {
-            // const { data } = await supabase
-            //     .from("loading-log")
-            //     .select()
-            //     .eq("id", logId);
-            // console.log(data);
-            // const updatedLog = await supabase
-            //     .from("loading-log")
-            //     .update({
-            //         ...data[0],
-            //         truck_no: truckRef.current.value || null,
-            //         type: typeRef.current.value || null,
-            //         wh_or_sale: whOrSaleRef.current.value || null,
-            //         loading_bay: loadingBay,
-            //         distributor: distributorRef.current.value || null
-            //     })
-            //     .eq("id", logId)
-            //     .select();
-            const updatedLog = await databases.updateDocument(
+        try {
+            setIsLoading(true);
+            const updatedTruck = await databases.updateDocument(
                 import.meta.env.VITE_APPWRITE_DB_ID,
-                "loading-logs",
-                logId,
+                "loading",
+                id,
                 {
                     truck_no: truckRef.current.value || null,
                     type: typeRef.current.value || null,
                     wh_or_sale: whOrSaleRef.current.value || null,
-                    loading_bay: loadingBay,
-                    distributor: distributorRef.current.value || null
+                    distributor: distributorRef.current.value || null,
+                    logId: logId
                 }
             );
-            console.log(updatedLog);
-            updateLog(logId, { ...updatedLog });
-        }
+            if (updatedTruck) {
+                updateTruck(id, { ...updatedTruck });
+            }
+            console.log(updatedTruck);
 
-        onClose();
+            if (logId) {
+                // const { data } = await supabase
+                //     .from("loading-log")
+                //     .select()
+                //     .eq("id", logId);
+                // console.log(data);
+                // const updatedLog = await supabase
+                //     .from("loading-log")
+                //     .update({
+                //         ...data[0],
+                //         truck_no: truckRef.current.value || null,
+                //         type: typeRef.current.value || null,
+                //         wh_or_sale: whOrSaleRef.current.value || null,
+                //         loading_bay: loadingBay,
+                //         distributor: distributorRef.current.value || null
+                //     })
+                //     .eq("id", logId)
+                //     .select();
+                const updatedLog = await databases.updateDocument(
+                    import.meta.env.VITE_APPWRITE_DB_ID,
+                    "loading-logs",
+                    logId,
+                    {
+                        truck_no: truckRef.current.value || null,
+                        type: typeRef.current.value || null,
+                        wh_or_sale: whOrSaleRef.current.value || null,
+                        loading_bay: loadingBay,
+                        distributor: distributorRef.current.value || null
+                    }
+                );
+                console.log(updatedLog);
+                updateLog(logId, { ...updatedLog });
+            }
+
+            onClose();
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return ReactDom.createPortal(
@@ -136,7 +152,7 @@ const Modal = ({
                                         ? "Truck no"
                                         : truckNo.toUpperCase()
                                 }
-                                className="p-1 w-full text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none"
+                                className="p-1 w-full text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none "
                             />
 
                             <select
@@ -192,15 +208,18 @@ const Modal = ({
                             </select>
                         </div>
                         <button
-                            className="p-2 font-bold bg-blue-600  rounded-sm"
+                            disabled={isLoading}
+                            className="flex justify-center gap-5 p-2 font-bold bg-blue-600  rounded-sm disabled:bg-stone-200/50"
                             onClick={handleUpdateTruck}>
-                            Update
+                            <b>{isLoading ? "Updating" : "Update"}</b>
+                            {isLoading && <Spinner />}
                         </button>
                         {/* </div> */}
                     </li>
                     <li className="mt-5">
                         <button
-                            className="p-2 my-2 rounded-sm w-full block font-bold bg-emerald-600"
+                            disabled={isLoading}
+                            className="p-2 my-2 rounded-sm w-full block font-bold bg-emerald-600 "
                             onClick={() => handleSelect("Free")}>
                             Free Loading
                         </button>
@@ -214,28 +233,32 @@ const Modal = ({
                     </li> */}
                     <li>
                         <button
-                            className="p-2 my-2 rounded-sm w-full block font-bold bg-yellow-400"
+                            disabled={isLoading}
+                            className="p-2 my-2 rounded-sm w-full block font-bold bg-yellow-400 "
                             onClick={() => handleSelect("Start")}>
                             Start Loading
                         </button>
                     </li>
                     <li>
                         <button
-                            className="p-2 my-2 rounded-sm w-full block font-bold bg-orange-500"
+                            disabled={isLoading}
+                            className="p-2 my-2 rounded-sm w-full block font-bold bg-orange-500 "
                             onClick={() => handleSelect("Half")}>
                             Half Loaded
                         </button>
                     </li>
                     <li>
                         <button
-                            className="p-2 my-2 rounded-sm w-full block font-bold bg-red-700"
+                            disabled={isLoading}
+                            className="p-2 my-2 rounded-sm w-full block font-bold bg-red-700 "
                             onClick={() => handleSelect("Loaded")}>
                             Fully Loaded
                         </button>
                     </li>
                     <li>
                         <button
-                            className="p-2 my-2 rounded-sm w-full block font-bold bg-stone-600"
+                            disabled={isLoading}
+                            className="p-2 my-2 rounded-sm w-full block font-bold bg-stone-800 "
                             onClick={() => handleSelect("Blocked")}>
                             Blocked Loading
                         </button>

@@ -1,41 +1,57 @@
 import ReactDom from "react-dom";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { supabase } from "../superbaseClient";
 import { databases } from "../lib/appwriteClient";
+import { Spinner } from "./Spinner";
 
 const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {
     const itemRef = useRef(null);
     const remarkRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(false);
     if (!isOpen) return null;
 
     const handleSelect = async (state) => {
-        await cb({
-            status: state,
-            item: itemRef.current.value || null,
-            remark: remarkRef.current.value || null
-        });
-        onClose();
+        try {
+            setIsLoading(true);
+            await cb({
+                status: state,
+                item: itemRef.current.value || null,
+                remark: remarkRef.current.value || null
+            });
+            onClose();
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleUpdateLine = async () => {
-        await databases.updateDocument(
-            import.meta.env.VITE_APPWRITE_DB_ID,
-            "packaging",
-            id,
-            {
-                item: itemRef.current.value || null,
-                remark: remarkRef.current.value || null
-            }
-        );
-        // await supabase
-        //     .from("packaging")
-        //     .update({
-        //         item: itemRef.current.value || null,
-        //         remark: remarkRef.current.value || null
-        //     })
-        //     .eq("id", id);
+        try {
+            setIsLoading(true);
+            await databases.updateDocument(
+                import.meta.env.VITE_APPWRITE_DB_ID,
+                "packaging",
+                id,
+                {
+                    item: itemRef.current.value || null,
+                    remark: remarkRef.current.value || null
+                }
+            );
+            // await supabase
+            //     .from("packaging")
+            //     .update({
+            //         item: itemRef.current.value || null,
+            //         remark: remarkRef.current.value || null
+            //     })
+            //     .eq("id", id);
 
-        onClose();
+            onClose();
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return ReactDom.createPortal(
@@ -73,9 +89,11 @@ const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {
                                 }></textarea>
 
                             <button
-                                className="p-2 font-bold bg-blue-600  rounded-sm"
+                                disabled={isLoading}
+                                className="flex justify-center gap-5 p-2 font-bold bg-blue-600  rounded-sm disabled:bg-stone-200/50"
                                 onClick={handleUpdateLine}>
-                                Update
+                                <b>{isLoading ? "Updating" : "Update"}</b>
+                                {isLoading && <Spinner />}
                             </button>
                         </div>
 
@@ -84,6 +102,7 @@ const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {
 
                     <li className="mt-5">
                         <button
+                            disabled={isLoading}
                             className="p-2 my-2 rounded-sm w-full block font-bold bg-stone-600"
                             onClick={() => handleSelect("Unknown")}>
                             Unknown
@@ -91,6 +110,7 @@ const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {
                     </li>
                     <li className="">
                         <button
+                            disabled={isLoading}
                             className="p-2 my-2 rounded-sm w-full block font-bold bg-emerald-600"
                             onClick={() => handleSelect("Running")}>
                             Running
@@ -99,6 +119,7 @@ const PackagingModal = ({ id, name, item, remark, isOpen, onClose, cb }) => {
 
                     <li>
                         <button
+                            disabled={isLoading}
                             className="p-2 my-2 rounded-sm w-full block font-bold bg-red-600"
                             onClick={() => handleSelect("No Production")}>
                             No Production

@@ -85,17 +85,19 @@ const LoadingLog = ({ logs }) => {
         if (loadingLogs.length === 0)
             return alert("No dataset records available to export.");
 
-        // 1. Map dataset cleanly (Content kept 100% identical)
+        // 1. Map dataset cleanly
         const spreadsheetRows = loadingLogs.map((log, index) => ({
             "No.": index + 1,
             "Truck Number": log.truck_no?.toUpperCase() || "—",
             "Truck Type": log.type ? `${log.type}` : "N/A",
             Distributor: log.distributor || "—",
-            "Start Time": new Date(log.start_time).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false
-            }),
+            "Start Time": log.start_time
+                ? new Date(log.start_time).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false
+                  })
+                : null,
             "Finish Time": log.finish_time
                 ? new Date(log.finish_time).toLocaleTimeString([], {
                       hour: "2-digit",
@@ -109,29 +111,67 @@ const LoadingLog = ({ logs }) => {
 
         // 2. Create Workbook & Worksheet
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("Operational Logs");
+        const now = new Date();
+        const worksheet = workbook.addWorksheet(`${now.getDate()}`);
 
-        // 3. Define Columns & Headers
+        // ----------------------------------------------------
+        // ADD MAIN HEADER (Row 1 & Row 2 for extra spacing/height)
+        // ----------------------------------------------------
         const headers = Object.keys(spreadsheetRows[0]);
+        const totalColumns = headers.length; // 8 columns (A to H)
+
+        // Merge cells across all columns (A1 to H1)
+        worksheet.mergeCells(1, 1, 1, totalColumns);
+
+        const mainHeaderCell = worksheet.getCell("A1");
+        mainHeaderCell.value = `Loading Efficiency Report - ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`;
+
+        // Style the Main Title
+        mainHeaderCell.font = {
+            name: "Arial",
+            size: 14,
+            bold: true,
+            color: { argb: "000000" } // White text
+        };
+        mainHeaderCell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "ffffff" } // Darker Navy Blue (Tailwind blue-900)
+        };
+        mainHeaderCell.alignment = {
+            horizontal: "center",
+            vertical: "middle"
+        };
+
+        // Set height for Title Row
+        worksheet.getRow(1).height = 35;
+
+        // 3. Define Table Columns & Add Column Headers at Row 2
+        worksheet.getRow(2).values = headers;
+        worksheet.getRow(2).height = 24;
+
+        // Configure column keys & widths
         worksheet.columns = headers.map((header) => ({
-            header: header,
             key: header,
-            width: 20 // Auto-width for clear visibility
+            width: 20
         }));
 
-        // 4. Add Rows Data
+        // 4. Add Data Rows (Starts from Row 3 automatically)
         spreadsheetRows.forEach((rowData) => {
             worksheet.addRow(rowData);
         });
 
-        // 5. Apply Formatting (Header: Blue BG, Bold White Text | All Cells: Centered)
+        // 5. Apply Formatting based on Row Numbers
         worksheet.eachRow((row, rowNumber) => {
+            // Skip Title Row formatting loop (already styled above)
+            if (rowNumber === 1) return;
+
             row.eachCell((cell) => {
                 // Center text across every single cell
                 cell.alignment = { horizontal: "center", vertical: "middle" };
 
-                // Header Row Styling (Row 1)
-                if (rowNumber === 1) {
+                // Column Header Row Styling (Row 2)
+                if (rowNumber === 2) {
                     cell.font = {
                         name: "Arial",
                         bold: true,
@@ -150,7 +190,7 @@ const LoadingLog = ({ logs }) => {
                         right: { style: "thin", color: { argb: "000000" } }
                     };
                 }
-                // Data Rows Styling
+                // Data Rows Styling (Row 3+)
                 else {
                     cell.font = { name: "Arial", size: 10 };
                     cell.border = {
