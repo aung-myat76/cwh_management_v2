@@ -48,7 +48,7 @@ const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
                 )
             ).toISOString() || updatedLog.finish_time;
         updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
-        updateLog(updatedLog.$id, updatedLog);
+        updateLog(id, updatedLog);
         setIsEditLoading(true);
         console.log(updatedLog);
         // const res = await supabase
@@ -56,7 +56,7 @@ const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
         //     .update({ ...updatedLog })
         //     .eq("id", updatedLog.id);
         const res = await databases.updateDocument(dbId, "loading-logs", id, {
-            ...updateLog
+            ...updatedLog
         });
         setIsEditLoading(false);
     };
@@ -80,7 +80,7 @@ const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
 
     return (
         <tr
-            key={log.id}
+            key={id}
             className="divide-x divide-slate-200 hover:bg-slate-50/70 transition-colors">
             {/* Row Index Indicator Counter */}
             <td className="py-2 px-3 font-bold text-center text-slate-400 bg-slate-50/50 select-none">

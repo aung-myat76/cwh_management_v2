@@ -465,7 +465,7 @@ const App = () => {
         ];
 
         const unsubscribe = realtime.subscribe(channels, (res) => {
-            const { events, payload, channels } = res;
+            const { events, payload } = res;
             // console.log(res, "this is res");
             // console.log(events, payload, eventChannels, channels);
             // console.log(events.some((e) => e.includes("collections.loading")));
@@ -492,9 +492,10 @@ const App = () => {
     const updateLog = (id, updatedLog) => {
         setLogs((preLogs) => {
             const updatedLogs = [...preLogs];
+
             const logIndex = updatedLogs.findIndex((l) => l.$id === id);
             const selectedLog = updatedLogs[logIndex];
-            console.log(updatedLog, selectedLog);
+            console.log(updatedLog, selectedLog, updatedLogs);
             selectedLog.truck_no = updatedLog.truck_no;
             selectedLog.type = updatedLog.type;
             selectedLog.distributor = updatedLog.distributor;
@@ -511,6 +512,7 @@ const App = () => {
             return updatedLogs.filter((l) => l.$id !== id);
         });
     };
+
     const updateTruck = (id, updatedTruck) => {
         console.log(updatedTruck);
         setTrucks((preTrucks) => {
@@ -601,6 +603,8 @@ const App = () => {
         console.log("reset");
     };
 
+    console.log(logs);
+
     return (
         <Routes>
             <Route
@@ -628,6 +632,7 @@ const App = () => {
                     element={
                         <LoadingLog
                             logs={logs}
+                            // setLoadingLogs={setLoadingLogs}
                             updateLog={updateLog}
                             deleteLog={deleteLog}
                         />

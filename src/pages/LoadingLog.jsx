@@ -4,13 +4,15 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import calculateDuration from "../lib/calculateDuration";
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "../superbaseClient";
+// import { supabase } from "../superbaseClient";
 import getByDate from "../lib/getByDate";
 import { databases } from "../lib/appwriteClient";
 import { Query } from "appwrite";
 
-const LoadingLog = ({ logs, updateLog, deleteLog }) => {
-    const [loadingLogs, setLoadingLogs] = useState([]);
+const LoadingLog = ({ logs }) => {
+    const [loadingLogs, setLoadingLogs] = useState(logs);
+    console.log(logs);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setLoadingLogs(logs);
@@ -20,31 +22,63 @@ const LoadingLog = ({ logs, updateLog, deleteLog }) => {
 
     const fetchByDate = async (date) => {
         console.log(date);
-        const res = await databases.listDocuments(
-            import.meta.env.VITE_APPWRITE_DB_ID,
-            "loading-logs",
-            [
-                Query.greaterThanEqual(
-                    "$createdAt",
-                    getByDate(new Date(date)).startOfDay
-                ),
-                Query.lessThanEqual(
-                    "$createdAt",
-                    getByDate(new Date(date)).endOfDay
-                )
-            ]
-        );
-        // const res = await supabase
-        //     .from("loading-log")
-        //     .select("*")
-        //     .gte("created_at", getByDate(date).startOfDay)
-        //     .lt("created_at", getByDate(date).endOfDay);
-        // setLoadingLogs(res.data);
-        console.log(res);
-        console.log("get by date");
+        try {
+            setLoading(true);
+            const res = await databases.listDocuments(
+                import.meta.env.VITE_APPWRITE_DB_ID,
+                "loading-logs",
+                [
+                    Query.greaterThanEqual(
+                        "$createdAt",
+                        getByDate(new Date(date)).startOfDay
+                    ),
+                    Query.lessThanEqual(
+                        "$createdAt",
+                        getByDate(new Date(date)).endOfDay
+                    )
+                ]
+            );
+            // const res = await supabase
+            //     .from("loading-log")
+            //     .select("*")
+            //     .gte("created_at", getByDate(date).startOfDay)
+            //     .lt("created_at", getByDate(date).endOfDay);
+            // setLoadingLogs(res.data);
+            console.log(res);
+            setLoadingLogs(res.documents);
+            console.log("get by date");
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    console.log(loadingLogs, logs);
+    const updateLog = (id, updatedLog) => {
+        setLoadingLogs((preLogs) => {
+            const updatedLogs = [...preLogs];
+
+            const logIndex = updatedLogs.findIndex((l) => l.$id === id);
+            const selectedLog = updatedLogs[logIndex];
+            console.log(updatedLog, selectedLog, updatedLogs);
+            selectedLog.truck_no = updatedLog.truck_no;
+            selectedLog.type = updatedLog.type;
+            selectedLog.distributor = updatedLog.distributor;
+            selectedLog.wh_or_sale = updatedLog.wh_or_sale;
+            selectedLog.remark = updatedLog.remark;
+
+            return updatedLogs;
+        });
+    };
+
+    const deleteLog = (id) => {
+        setLoadingLogs((preLogs) => {
+            const updatedLogs = [...preLogs];
+            return updatedLogs.filter((l) => l.$id !== id);
+        });
+    };
+
+    console.log(loadingLogs);
 
     const handleExportToExcel = async () => {
         if (!confirm("Are you sure to export as an Excel file?")) return;
@@ -164,7 +198,7 @@ const LoadingLog = ({ logs, updateLog, deleteLog }) => {
                     <div className="text-xs font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 self-start sm:self-auto shrink-0">
                         Total Rows:{" "}
                         <span className="text-slate-900">
-                            {loadingLogs.length}
+                            {!loading && loadingLogs && loadingLogs.length}
                         </span>
                     </div>
 
@@ -221,7 +255,9 @@ const LoadingLog = ({ logs, updateLog, deleteLog }) => {
 
                         {/* Spreadsheet Body Rows */}
                         <tbody className="divide-y divide-slate-200 text-xs font-mono text-slate-700">
-                            {loadingLogs.length > 0 ? (
+                            {!loading &&
+                            loadingLogs &&
+                            loadingLogs.length > 0 ? (
                                 loadingLogs.map((log, index) => {
                                     return (
                                         <LoadingLogRow
@@ -242,6 +278,15 @@ const LoadingLog = ({ logs, updateLog, deleteLog }) => {
                                         className="py-10 text-center text-slate-400 italic font-sans font-medium">
                                         No logistics dataset records found in
                                         current matrix registry.
+                                    </td>
+                                </tr>
+                            )}
+                            {loading && (
+                                <tr>
+                                    <td
+                                        colSpan={8}
+                                        className="py-10 text-center text-slate-400 italic font-sans font-medium">
+                                        Loading...
                                     </td>
                                 </tr>
                             )}

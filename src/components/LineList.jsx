@@ -7,8 +7,8 @@ const LineList = ({ lines, updateLine }) => {
             {lines.length > 0 &&
                 lines.map((line) => (
                     <Line
-                        key={line.id}
-                        id={line.id}
+                        key={line.$id}
+                        id={line.$id}
                         name={line.name}
                         item={line.item}
                         status={line.status}
