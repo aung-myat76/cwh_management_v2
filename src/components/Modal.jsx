@@ -112,7 +112,7 @@ const Modal = ({
                     }
                 );
                 console.log(updatedLog);
-                updateLog(logId, { ...updatedLog });
+                // updateLog(logId, { ...updatedLog });
             }
 
             onClose();
