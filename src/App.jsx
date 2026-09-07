@@ -14,6 +14,7 @@ import LoadingLog from "./pages/LoadingLog";
 import { databases, realtime } from "./lib/appwriteClient";
 import { ID, Query } from "appwrite";
 import getByDate from "./lib/getByDate";
+import Setting from "./pages/Setting";
 // import { cleanDocument } from "./lib/cleanDocument";
 
 // const getShift = () => {
@@ -605,6 +606,73 @@ const App = () => {
 
     console.log(logs);
 
+    const resetLoadingBay = async () => {
+        console.log("reset loading");
+        const defaultTruck = {
+            truck_no: null,
+            type: null,
+            distributor: null,
+            wh_or_sale: null,
+            logId: null,
+            condition: "Free"
+        };
+        try {
+            setLoading(true);
+            const res = await databases.listDocuments(
+                dbId,
+                collections.loading,
+                [Query.select("$id")]
+            );
+            const updatedLoading = await res.documents.map((l) =>
+                databases.updateDocument(dbId, collections.loading, l.$id, {
+                    ...defaultTruck
+                })
+            );
+            console.log(updatedLoading);
+            setTrucks((preTrucks) => {
+                return [...preTrucks].map((t) => {
+                    return { ...t, ...defaultTruck };
+                });
+            });
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const resetLoadingLogsByDate = async (date) => {
+        console.log(date);
+        try {
+            setLoading(true);
+            const res = await databases.listDocuments(
+                dbId,
+                collections.loadingLogs,
+                [
+                    Query.greaterThanEqual(
+                        "$createdAt",
+                        getByDate(new Date(date)).startOfDay
+                    ),
+                    Query.lessThanEqual(
+                        "$createdAt",
+                        getByDate(new Date(date)).endOfDay
+                    ),
+                    Query.select("$id")
+                ]
+            );
+            console.log(res);
+            const updatedLog = await res.documents.map((l) =>
+                databases.deleteDocument(dbId, collections.loadingLogs, l.$id)
+            );
+            console.log(updatedLog);
+            setLogs([]);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Routes>
             <Route
@@ -642,6 +710,15 @@ const App = () => {
                     path="/packaging"
                     element={
                         <Packaging lines={lines} updateLine={updateLine} />
+                    }
+                />
+                <Route
+                    path="/setting"
+                    element={
+                        <Setting
+                            resetLoadingLogsByDate={resetLoadingLogsByDate}
+                            resetLoadingBay={resetLoadingBay}
+                        />
                     }
                 />
                 <Route path="*" element={<Navigate to={"/"} />} />

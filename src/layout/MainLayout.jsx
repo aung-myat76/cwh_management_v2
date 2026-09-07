@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, Link } from "react-router-dom";
 import ConfirmModal from "../components/ConfirmModal";
 import cn from "../lib/cn";
 
@@ -15,18 +15,71 @@ const MainLayout = ({ handleReset, getLastUpdatedTime }) => {
 
     return (
         <div>
-            <ConfirmModal isOpen={isOpen} onClose={onClose} cb={handleReset} />
+            {/* <ConfirmModal isOpen={isOpen} onClose={onClose} cb={handleReset} /> */}
             <header className="flex items-center justify-between py-3 px-1 bg-emerald-800 text-white ">
                 <h1 className="text-md font-bold">
                     CWH ( YARD Management System )
                 </h1>
 
-                <div>
+                <div id="drawer-container">
                     <button
                         onClick={onOpen}
-                        className="bg-red-600 p-2 rounded-md text-white">
-                        Reset
+                        id="drawer-trigger"
+                        className="bg-stone-800 p-2 rounded-md text-white">
+                        Menu
                     </button>
+
+                    <div
+                        id="drawer-overlay"
+                        className={`${isOpen ? "open" : null}`}
+                        onClick={onClose}
+                    />
+                    <aside
+                        id="drawer-content"
+                        className={`${isOpen ? "open" : null}`}>
+                        <div id="drawer-header">
+                            <button
+                                className="bg-stone   text-lg rounded-md"
+                                onClick={onClose}>
+                                X
+                            </button>
+                        </div>
+                        <div id="drawer-body">
+                            <NavLink
+                                onClick={onClose}
+                                className={({ isActive }) =>
+                                    cn(
+                                        "py-2 font-bold",
+                                        isActive ? "text-emerald-500 " : ""
+                                    )
+                                }
+                                to={"/"}>
+                                Home
+                            </NavLink>
+                            <NavLink
+                                onClick={onClose}
+                                className={({ isActive }) =>
+                                    cn(
+                                        "py-2 font-bold",
+                                        isActive ? "text-emerald-500 " : ""
+                                    )
+                                }
+                                to={"/loading-log"}>
+                                Loading Log
+                            </NavLink>
+                            <NavLink
+                                onClick={onClose}
+                                className={({ isActive }) =>
+                                    cn(
+                                        "py-2 font-bold",
+                                        isActive ? "text-emerald-500 " : ""
+                                    )
+                                }
+                                to={"/setting"}>
+                                Setting
+                            </NavLink>
+                        </div>
+                    </aside>
                 </div>
             </header>
             <nav className="bg-emerald-900 p-3 mb-5">
@@ -42,7 +95,7 @@ const MainLayout = ({ handleReset, getLastUpdatedTime }) => {
                     to={"/"}>
                     Loading
                 </NavLink>
-                <NavLink
+                {/* <NavLink
                     className={({ isActive }) =>
                         cn(
                             " px-1 mx-2 font-bold",
@@ -53,7 +106,7 @@ const MainLayout = ({ handleReset, getLastUpdatedTime }) => {
                     }
                     to={"/loading-log"}>
                     Loading Log
-                </NavLink>
+                </NavLink> */}
                 <NavLink
                     className={({ isActive }) =>
                         cn(
