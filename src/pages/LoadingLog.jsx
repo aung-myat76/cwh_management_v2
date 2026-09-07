@@ -321,15 +321,6 @@ const LoadingLog = ({ logs }) => {
                                     </td>
                                 </tr>
                             )}
-                            {loading && (
-                                <tr>
-                                    <td
-                                        colSpan={8}
-                                        className="py-10 text-center text-slate-400 italic font-sans font-medium">
-                                        Loading...
-                                    </td>
-                                </tr>
-                            )}
                         </tbody>
                     </table>
                 </div>
