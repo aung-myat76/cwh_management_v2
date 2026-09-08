@@ -48,8 +48,11 @@ const MainLayout = ({ getLastUpdatedTime }) => {
                     <button
                         onClick={onOpen}
                         id="drawer-trigger"
-                        className="bg-stone-800 p-2 rounded-md text-white">
-                        Menu
+                        aria-label="menu"
+                        className="bg-stone-800 flex flex-col justify-center items-center gap-[2px] p-2 rounded-sm text-white">
+                        <div className="w-[20px] h-[2px] rounded bg-stone-100"></div>
+                        <div className="w-[20px] h-[2px] rounded bg-stone-100"></div>
+                        <div className="w-[20px] h-[2px] rounded bg-stone-100"></div>
                     </button>
 
                     <div
