@@ -16,7 +16,7 @@ const MainLayout = ({ getLastUpdatedTime }) => {
     return (
         <div>
             {/* <ConfirmModal isOpen={isOpen} onClose={onClose} cb={handleReset} /> */}
-            <header className="flex items-center justify-between py-3 px-1 bg-emerald-800 text-white ">
+            <header className="flex items-center justify-between py-3 px-2 bg-emerald-800 text-white ">
                 <h1 className="text-md font-bold">
                     CWH ( YARD Management System )
                 </h1>
@@ -50,9 +50,9 @@ const MainLayout = ({ getLastUpdatedTime }) => {
                         id="drawer-trigger"
                         aria-label="menu"
                         className="bg-stone-800 flex flex-col justify-center items-center gap-[2px] p-2 rounded-sm text-white">
-                        <div className="w-[20px] h-[2px] rounded bg-stone-100"></div>
-                        <div className="w-[20px] h-[2px] rounded bg-stone-100"></div>
-                        <div className="w-[20px] h-[2px] rounded bg-stone-100"></div>
+                        <div className="w-[25px] h-[3px] rounded bg-stone-100"></div>
+                        <div className="w-[25px] h-[3px] rounded bg-stone-100"></div>
+                        <div className="w-[25px] h-[3px] rounded bg-stone-100"></div>
                     </button>
 
                     <div
