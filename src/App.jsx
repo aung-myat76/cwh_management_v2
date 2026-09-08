@@ -477,18 +477,24 @@ const App = () => {
             // console.log(res, "this is res");
             // console.log(events, payload, eventChannels, channels);
             // console.log(events.some((e) => e.includes("collections.loading")));
-            if (events.some((e) => e.includes("collections.loading"))) {
+            if (
+                events.some((e) => e.includes("collections.loading.documents"))
+            ) {
                 setTrucks((prev) =>
                     updateCollectionState([...prev], events, payload)
                 );
             } else if (
-                events.some((e) => e.includes("collections.packaging"))
+                events.some((e) =>
+                    e.includes("collections.packaging.documents")
+                )
             ) {
                 setLines((prev) =>
                     updateCollectionState([...prev], events, payload)
                 );
             } else if (
-                events.some((e) => e.includes("collections.loading-logs"))
+                events.some((e) =>
+                    e.includes("collections.loading-logs.documents")
+                )
             ) {
                 setLogs((prev) =>
                     updateCollectionState([...prev], events, payload)
