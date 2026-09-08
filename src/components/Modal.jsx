@@ -111,7 +111,7 @@ const Modal = ({
                         distributor: distributorRef.current.value || null
                     }
                 );
-                console.log(updatedLog);
+                // console.log(updatedLog);
                 // updateLog(logId, { ...updatedLog });
             }
 

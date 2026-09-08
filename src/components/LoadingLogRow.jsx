@@ -27,7 +27,7 @@ const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
     const hanldeEditLog = async () => {
         // const updatedLog = loadingLogs.find((l) => l._id === log._id);
         const updatedLog = { ...log };
-        console.log(startTimeRef.current.value, finishTimeRef.current.value);
+        // console.log(startTimeRef.current.value, finishTimeRef.current.value);
         updatedLog.truck_no = truckNoRef.current?.value || updatedLog.truck_no;
         updatedLog.type = truckTypeRef.current?.value || updatedLog.type;
         updatedLog.distributor =
@@ -53,7 +53,7 @@ const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
         updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
         updateLog(id, updatedLog);
         setIsEditLoading(true);
-        console.log(updatedLog);
+        // console.log(updatedLog);
         // const res = await supabase
         //     .from("loading-log")
         //     .update({ ...updatedLog })

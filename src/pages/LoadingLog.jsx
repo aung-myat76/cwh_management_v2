@@ -11,7 +11,7 @@ import { Query } from "appwrite";
 
 const LoadingLog = ({ logs }) => {
     const [loadingLogs, setLoadingLogs] = useState(logs);
-    console.log(logs);
+    // console.log(logs);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -21,7 +21,7 @@ const LoadingLog = ({ logs }) => {
     const dateRef = useRef();
 
     const fetchByDate = async (date) => {
-        console.log(date);
+        // console.log(date);
         try {
             setLoading(true);
             const res = await databases.listDocuments(
@@ -44,9 +44,9 @@ const LoadingLog = ({ logs }) => {
             //     .gte("created_at", getByDate(date).startOfDay)
             //     .lt("created_at", getByDate(date).endOfDay);
             // setLoadingLogs(res.data);
-            console.log(res);
+            // console.log(res);
             setLoadingLogs(res.documents);
-            console.log("get by date");
+            // console.log("get by date");
         } catch (err) {
             console.log(err);
         } finally {
@@ -60,7 +60,7 @@ const LoadingLog = ({ logs }) => {
 
             const logIndex = updatedLogs.findIndex((l) => l.$id === id);
             const selectedLog = updatedLogs[logIndex];
-            console.log(updatedLog, selectedLog, updatedLogs);
+            // console.log(updatedLog, selectedLog, updatedLogs);
             selectedLog.truck_no = updatedLog.truck_no;
             selectedLog.type = updatedLog.type;
             selectedLog.distributor = updatedLog.distributor;
@@ -78,7 +78,7 @@ const LoadingLog = ({ logs }) => {
         });
     };
 
-    console.log(loadingLogs);
+    // console.log(loadingLogs);
 
     const handleExportToExcel = async () => {
         if (!confirm("Are you sure to export as an Excel file?")) return;

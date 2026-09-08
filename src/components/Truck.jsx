@@ -31,7 +31,7 @@ const Truck = ({
                     condition: state.condition
                 });
             } else {
-                console.log(state);
+                // console.log(state);
                 if (state.logId) {
                     // const { data } = await supabase
                     //     .from("loading-log")

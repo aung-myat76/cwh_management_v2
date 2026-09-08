@@ -7,7 +7,7 @@ const now = new Date();
 
 const nowDate = now.toLocaleDateString("en-GB");
 
-const MainLayout = ({ handleReset, getLastUpdatedTime }) => {
+const MainLayout = ({ getLastUpdatedTime }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const onOpen = () => setIsOpen(true);

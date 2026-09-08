@@ -46,11 +46,11 @@ const App = () => {
 
     const updateCondition = useCallback(async (id, newState) => {
         // check log id
-        console.log(newState);
+        // console.log(newState);
         // if it doesn't have log id create log
         // if it has update truck with that log id
         if (!newState.logId && newState.condition === "Start") {
-            console.log("not exist");
+            // console.log("not exist");
             // const newLog = await supabase
             //     .from("loading-log")
             //     .insert([
@@ -74,12 +74,16 @@ const App = () => {
                 newLogData
             );
 
-            console.log(newLog);
+            // console.log(newLog);
             setTrucks((preTrucks) => {
                 const updatedTrucks = [...preTrucks];
                 const updateTruckIndex = updatedTrucks.findIndex(
                     (t) => t.$id === id
                 );
+
+                if (!updateTruckIndex) {
+                    console.log("truck not found");
+                }
                 const updatedTruck = updatedTrucks[updateTruckIndex];
                 updatedTruck.condition = newState.condition;
                 updatedTruck["truck_no"] = newState["truck_no"];
@@ -103,7 +107,7 @@ const App = () => {
             //     .from("trucks")
             //     .update({ ...newState, logId: newLog.data[0].id })
             //     .eq("id", id);
-            console.log(newLog);
+            // console.log(newLog);
             return await databases.updateDocument(
                 dbId,
                 collections.loading,
@@ -111,7 +115,7 @@ const App = () => {
                 { ...newState, logId: newLog.$id }
             );
         } else if (newState.logId) {
-            console.log("exist");
+            // console.log("exist");
             const updatedLog = await databases.updateDocument(
                 dbId,
                 collections.loadingLogs,
@@ -120,7 +124,7 @@ const App = () => {
                     finish_time: new Date()
                 }
             );
-            console.log(updatedLog);
+            // console.log(updatedLog);
             // const { data } = await supabase
             //     .from("loading-log")
             //     .select()
@@ -134,12 +138,12 @@ const App = () => {
             //     .eq("id", newState.logId)
             //     .select();
             let truck = { ...newState };
-            console.log(newState.condition);
+            // console.log(newState.condition);
             if (
                 newState.condition === "Free" ||
                 newState.condition === "Blocked"
             ) {
-                console.log(99);
+                // console.log(99);
                 truck = {
                     ...newState,
                     condition: newState.condition,
@@ -178,7 +182,7 @@ const App = () => {
                 }
                 return updatedLogs;
             });
-            console.log(truck);
+            // console.log(truck);
 
             return await databases.updateDocument(
                 dbId,
@@ -225,7 +229,7 @@ const App = () => {
         const lastTime = Math.max(...TTimes, ...LTimes);
 
         const date = new Date(lastTime);
-        console.log(lastTime, date);
+        // console.log(lastTime, date);
         const dateString = date.toLocaleTimeString("en-GB", {
             hour: "2-digit",
             minute: "2-digit",
@@ -407,7 +411,9 @@ const App = () => {
     const updateCollectionState = (list, events, payload) => {
         // 1. CREATE
         // console.log(events, payload);
+        // console.log(payload, list);
         if (events.some((e) => e.endsWith(".create"))) {
+            console.log("create", list, payload);
             // Avoid duplicates if the item was already added locally
             if (list.some((item) => item.$id === payload.$id)) return list;
             return [...list, payload];
@@ -416,6 +422,7 @@ const App = () => {
         // 2. UPDATE
         if (events.some((e) => e.endsWith(".update"))) {
             // console.log(payload);
+            console.log("update", list, payload);
             return list.map((item) =>
                 item.$id === payload.$id ? payload : item
             );
@@ -472,18 +479,20 @@ const App = () => {
             // console.log(events.some((e) => e.includes("collections.loading")));
             if (events.some((e) => e.includes("collections.loading"))) {
                 setTrucks((prev) =>
-                    updateCollectionState(prev, events, payload)
+                    updateCollectionState([...prev], events, payload)
                 );
             } else if (
                 events.some((e) => e.includes("collections.packaging"))
             ) {
                 setLines((prev) =>
-                    updateCollectionState(prev, events, payload)
+                    updateCollectionState([...prev], events, payload)
                 );
             } else if (
                 events.some((e) => e.includes("collections.loading-logs"))
             ) {
-                setLogs((prev) => updateCollectionState(prev, events, payload));
+                setLogs((prev) =>
+                    updateCollectionState([...prev], events, payload)
+                );
             }
         });
 
@@ -496,7 +505,7 @@ const App = () => {
 
             const logIndex = updatedLogs.findIndex((l) => l.$id === id);
             const selectedLog = updatedLogs[logIndex];
-            console.log(updatedLog, selectedLog, updatedLogs);
+            // console.log(updatedLog, selectedLog, updatedLogs);
             selectedLog.truck_no = updatedLog.truck_no;
             selectedLog.type = updatedLog.type;
             selectedLog.distributor = updatedLog.distributor;
@@ -515,12 +524,12 @@ const App = () => {
     };
 
     const updateTruck = (id, updatedTruck) => {
-        console.log(updatedTruck);
+        // console.log(updatedTruck);
         setTrucks((preTrucks) => {
             const updatedTrucks = [...preTrucks];
             const logIndex = updatedTrucks.findIndex((l) => l.$id === id);
             const selectedTruck = updatedTrucks[logIndex];
-            console.log(selectedTruck);
+            // console.log(selectedTruck);
             selectedTruck.truck_no = updatedTruck.truck_no;
             selectedTruck.type = updatedTruck.type;
             selectedTruck.distributor = updatedTruck.distributor;
@@ -529,85 +538,85 @@ const App = () => {
         });
     };
 
-    const handleReset = async () => {
-        try {
-            setLoading(true);
-            const defaultTruck = {
-                truck_no: null,
-                type: null,
-                distributor: null,
-                wh_or_sale: null,
-                logId: null,
-                condition: "Free"
-            };
-            const loadingRes = await databases.listDocuments(
-                dbId,
-                collections.loading,
-                [Query.select(["$id"])]
-            );
-            const loadingProm = loadingRes.documents.map((l) =>
-                databases.updateDocument(dbId, collections.loading, l.$id, {
-                    ...defaultTruck
-                })
-            );
-            const logRes = await databases.listDocuments(
-                dbId,
-                collections.loadingLogs,
-                [Query.select(["$id"])]
-            );
-            const logProm = logRes.documents.map((l) =>
-                databases.deleteDocument(dbId, collections.loadingLogs, l.$id)
-            );
-            const porms = [loadingProm, logProm];
-            const [loading, log] = await Promise.all(porms);
-            // if (loading && log)
-            console.log(loading, log);
-            setTrucks((preTrucks) => {
-                return [...preTrucks].map((t) => {
-                    return { ...t, ...defaultTruck };
-                });
-            });
-            setLogs([]);
-        } catch (err) {
-            console.log(err);
-        } finally {
-            setLoading(false);
-        }
-        // const [loading, log] = await Promise.all([
-        //     supabase
-        //         .from("trucks")
-        //         .update({
-        //             condition: "Free",
-        //             truck_no: null,
-        //             wh_or_sale: null,
-        //             type: null,
-        //             logId: null,
-        //             distributor: null
-        //         })
-        //         .not("id", "is", null),
-        //     supabase.from("loading-log").delete().gt("id", 0)
-        // ]);
-        // console.log(loading, log);
-        // setTrucks((preTrucks) => {
-        //     const updatedTrucks = [...preTrucks];
-        //     updatedTrucks.map((t) => {
-        //         (t.condition = "Free"),
-        //             (t.truck_no = "-"),
-        //             (t.type = null),
-        //             (t.wh_or_sale = null),
-        //             (t.distributor = null);
-        //     });
-        //     return updatedTrucks;
-        // });
-        // setLogs([]);
-        // setLoading(false);
-        console.log("reset");
-    };
+    // const handleReset = async () => {
+    //     try {
+    //         setLoading(true);
+    //         const defaultTruck = {
+    //             truck_no: null,
+    //             type: null,
+    //             distributor: null,
+    //             wh_or_sale: null,
+    //             logId: null,
+    //             condition: "Free"
+    //         };
+    //         const loadingRes = await databases.listDocuments(
+    //             dbId,
+    //             collections.loading,
+    //             [Query.select(["$id"])]
+    //         );
+    //         const loadingProm = loadingRes.documents.map((l) =>
+    //             databases.updateDocument(dbId, collections.loading, l.$id, {
+    //                 ...defaultTruck
+    //             })
+    //         );
+    //         const logRes = await databases.listDocuments(
+    //             dbId,
+    //             collections.loadingLogs,
+    //             [Query.select(["$id"])]
+    //         );
+    //         const logProm = logRes.documents.map((l) =>
+    //             databases.deleteDocument(dbId, collections.loadingLogs, l.$id)
+    //         );
+    //         const porms = [loadingProm, logProm];
+    //         const [loading, log] = await Promise.all(porms);
+    //         // if (loading && log)
+    //         console.log(loading, log);
+    //         setTrucks((preTrucks) => {
+    //             return [...preTrucks].map((t) => {
+    //                 return { ...t, ...defaultTruck };
+    //             });
+    //         });
+    //         setLogs([]);
+    //     } catch (err) {
+    //         console.log(err);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    //     // const [loading, log] = await Promise.all([
+    //     //     supabase
+    //     //         .from("trucks")
+    //     //         .update({
+    //     //             condition: "Free",
+    //     //             truck_no: null,
+    //     //             wh_or_sale: null,
+    //     //             type: null,
+    //     //             logId: null,
+    //     //             distributor: null
+    //     //         })
+    //     //         .not("id", "is", null),
+    //     //     supabase.from("loading-log").delete().gt("id", 0)
+    //     // ]);
+    //     // console.log(loading, log);
+    //     // setTrucks((preTrucks) => {
+    //     //     const updatedTrucks = [...preTrucks];
+    //     //     updatedTrucks.map((t) => {
+    //     //         (t.condition = "Free"),
+    //     //             (t.truck_no = "-"),
+    //     //             (t.type = null),
+    //     //             (t.wh_or_sale = null),
+    //     //             (t.distributor = null);
+    //     //     });
+    //     //     return updatedTrucks;
+    //     // });
+    //     // setLogs([]);
+    //     // setLoading(false);
+    //     console.log("reset");
+    // };
 
-    console.log(logs);
+    // console.log(logs);
 
     const resetLoadingBay = async () => {
-        console.log("reset loading");
+        // console.log("reset loading");
         const defaultTruck = {
             truck_no: null,
             type: null,
@@ -628,7 +637,7 @@ const App = () => {
                     ...defaultTruck
                 })
             );
-            console.log(updatedLoading);
+            // console.log(updatedLoading);
             setTrucks((preTrucks) => {
                 return [...preTrucks].map((t) => {
                     return { ...t, ...defaultTruck };
@@ -642,7 +651,7 @@ const App = () => {
     };
 
     const resetLoadingLogsByDate = async (date) => {
-        console.log(date);
+        // console.log(date);
         try {
             setLoading(true);
             const res = await databases.listDocuments(
@@ -660,11 +669,11 @@ const App = () => {
                     Query.select("$id")
                 ]
             );
-            console.log(res);
+            // console.log(res);
             const updatedLog = await res.documents.map((l) =>
                 databases.deleteDocument(dbId, collections.loadingLogs, l.$id)
             );
-            console.log(updatedLog);
+            // console.log(updatedLog);
             setLogs([]);
         } catch (err) {
             console.log(err);
@@ -679,7 +688,7 @@ const App = () => {
                 path="/"
                 element={
                     <MainLayout
-                        handleReset={handleReset}
+                        // handleReset={handleReset}
                         getLastUpdatedTime={getLastUpdatedTime}
                     />
                 }>
