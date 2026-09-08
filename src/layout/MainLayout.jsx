@@ -20,8 +20,31 @@ const MainLayout = ({ getLastUpdatedTime }) => {
                 <h1 className="text-md font-bold">
                     CWH ( YARD Management System )
                 </h1>
-
-                <div id="drawer-container">
+                <div className="hidden md:block">
+                    <NavLink
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                            cn(
+                                "p-2 font-bold",
+                                isActive ? "text-emerald-500 " : ""
+                            )
+                        }
+                        to={"/loading-log"}>
+                        Loading Log
+                    </NavLink>
+                    <NavLink
+                        onClick={onClose}
+                        className={({ isActive }) =>
+                            cn(
+                                "p-2 font-bold",
+                                isActive ? "text-emerald-500 " : ""
+                            )
+                        }
+                        to={"/setting"}>
+                        Setting
+                    </NavLink>
+                </div>
+                <div id="drawer-container" className="md:hidden">
                     <button
                         onClick={onOpen}
                         id="drawer-trigger"
