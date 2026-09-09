@@ -111,7 +111,8 @@ const LoadingLog = ({ logs }) => {
 
         // 2. Create Workbook & Worksheet
         const workbook = new ExcelJS.Workbook();
-        const now = new Date();
+        const date = dateRef.current.value;
+        const now = new Date(date);
         const worksheet = workbook.addWorksheet(`${now.getDate()}`);
 
         // ----------------------------------------------------
@@ -204,7 +205,8 @@ const LoadingLog = ({ logs }) => {
         });
 
         // 6. Generate Buffer & Download File
-        const timestamp = new Date().toISOString().split("T")[0];
+
+        const timestamp = new Date(date).toISOString().split("T")[0];
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

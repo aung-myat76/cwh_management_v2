@@ -435,6 +435,7 @@ const App = () => {
 
         return list;
     };
+
     useEffect(() => {
         const fetchInitialData = async () => {
             setLoading(true);
