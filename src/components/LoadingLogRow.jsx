@@ -59,7 +59,7 @@ const LoadingLogRow = ({
                   )
               ).toISOString()
             : updatedLog.finish_time;
-        updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
+        updatedLog.remark = remarkRef.current?.value;
         updateLog(id, updatedLog);
 
         // update loading truck if the existing one is edited / deleted
