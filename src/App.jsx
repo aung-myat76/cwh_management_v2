@@ -730,6 +730,7 @@ const App = () => {
                     element={
                         <LoadingLog
                             logs={logs}
+                            trucks={trucks}
                             // setLoadingLogs={setLoadingLogs}
                             updateLog={updateLog}
                             deleteLog={deleteLog}

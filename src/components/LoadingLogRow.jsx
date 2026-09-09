@@ -6,7 +6,15 @@ import { databases } from "../lib/appwriteClient";
 // };
 const dbId = import.meta.env.VITE_APPWRITE_DB_ID;
 
-const LoadingLogRow = ({ log, id, index, date, updateLog, deleteLog }) => {
+const LoadingLogRow = ({
+    log,
+    id,
+    index,
+    trucks,
+    date,
+    updateLog,
+    deleteLog
+}) => {
     // const { loadingLogs } = useAppState();
     // const dispatch = useAppDispatch();
     // const [isEditLoading, setIsEditLoading] = useState(false);
@@ -42,14 +50,7 @@ const LoadingLogRow = ({ log, id, index, date, updateLog, deleteLog }) => {
                   )
               ).toISOString()
             : updatedLog.start_time;
-        console.log(
-            new Date(
-                new Date().setHours(
-                    +finishTimeRef.current.value.split(":")[0],
-                    +finishTimeRef.current.value.split(":")[1]
-                )
-            ).toISOString()
-        );
+
         updatedLog.finish_time = finishTimeRef.current.value
             ? new Date(
                   new Date(date).setHours(
@@ -60,6 +61,27 @@ const LoadingLogRow = ({ log, id, index, date, updateLog, deleteLog }) => {
             : updatedLog.finish_time;
         updatedLog.remark = remarkRef.current?.value || updatedLog.remark;
         updateLog(id, updatedLog);
+
+        // update loading truck if the existing one is edited / deleted
+        const currentTruckIndex = trucks.findIndex((t) => t.logId === id);
+        const currentTruck = trucks[currentTruckIndex];
+        console.log(currentTruck);
+
+        if (currentTruck) {
+            const res = await databases.updateDocument(
+                dbId,
+                "loading",
+                currentTruck.$id,
+                {
+                    truck_no: updatedLog.truck_no,
+                    type: updatedLog.type,
+                    distributor: updatedLog.distributor,
+                    wh_or_sale: updatedLog.wh_or_sale
+                }
+            );
+        }
+
+        console.log(trucks);
         setIsEditLoading(true);
         // console.log(updatedLog);
         // const res = await supabase
@@ -76,6 +98,26 @@ const LoadingLogRow = ({ log, id, index, date, updateLog, deleteLog }) => {
         if (confirm(`Are you sure to delete truck no - ${log.truck_no} ?`)) {
             setIsDeleteLoading(true);
             deleteLog(id);
+
+            const currentTruckIndex = trucks.findIndex((t) => t.logId === id);
+            const currentTruck = trucks[currentTruckIndex];
+            console.log(currentTruck);
+
+            if (currentTruck) {
+                const res = await databases.updateDocument(
+                    dbId,
+                    "loading",
+                    currentTruck.$id,
+                    {
+                        truck_no: null,
+                        type: null,
+                        distributor: null,
+                        wh_or_sale: null,
+                        condition: "Free",
+                        logId: null
+                    }
+                );
+            }
             // const res = await supabase
             //     .from("loading-log")
             //     .delete()

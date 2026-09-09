@@ -9,7 +9,7 @@ import getByDate from "../lib/getByDate";
 import { databases } from "../lib/appwriteClient";
 import { Query } from "appwrite";
 
-const LoadingLog = ({ logs }) => {
+const LoadingLog = ({ logs, trucks }) => {
     const [loadingLogs, setLoadingLogs] = useState(logs);
     // console.log(logs);
     const [loading, setLoading] = useState(false);
@@ -303,6 +303,7 @@ const LoadingLog = ({ logs }) => {
                                 loadingLogs.map((log, index) => {
                                     return (
                                         <LoadingLogRow
+                                            trucks={trucks}
                                             date={
                                                 dateRef.current
                                                     ? dateRef.current.value
