@@ -160,8 +160,6 @@ const App = () => {
                     distributor: null,
                     logId: null
                 };
-            } else if (newState.condition === "Loaded") {
-                truck.logId = null;
             }
 
             truck.condition = newState.condition;
