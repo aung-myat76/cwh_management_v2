@@ -6,7 +6,7 @@ import { databases } from "../lib/appwriteClient";
 // };
 const dbId = import.meta.env.VITE_APPWRITE_DB_ID;
 
-const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
+const LoadingLogRow = ({ log, id, index, date, updateLog, deleteLog }) => {
     // const { loadingLogs } = useAppState();
     // const dispatch = useAppDispatch();
     // const [isEditLoading, setIsEditLoading] = useState(false);
@@ -36,15 +36,23 @@ const LoadingLogRow = ({ log, id, index, updateLog, deleteLog }) => {
             destinationRef.current?.value || updatedLog.wh_or_sale;
         updatedLog.start_time = startTimeRef.current.value
             ? new Date(
-                  new Date(updatedLog.start_time).setHours(
+                  new Date(date).setHours(
                       +startTimeRef.current.value.split(":")[0],
                       +startTimeRef.current.value.split(":")[1]
                   )
               ).toISOString()
             : updatedLog.start_time;
+        console.log(
+            new Date(
+                new Date().setHours(
+                    +finishTimeRef.current.value.split(":")[0],
+                    +finishTimeRef.current.value.split(":")[1]
+                )
+            ).toISOString()
+        );
         updatedLog.finish_time = finishTimeRef.current.value
             ? new Date(
-                  new Date(updatedLog.finish_time).setHours(
+                  new Date(date).setHours(
                       +finishTimeRef.current.value.split(":")[0],
                       +finishTimeRef.current.value.split(":")[1]
                   )

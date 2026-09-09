@@ -303,6 +303,7 @@ const LoadingLog = ({ logs }) => {
                                 loadingLogs.map((log, index) => {
                                     return (
                                         <LoadingLogRow
+                                            date={dateRef.current.value}
                                             key={log.$id}
                                             id={log.$id}
                                             log={log}
