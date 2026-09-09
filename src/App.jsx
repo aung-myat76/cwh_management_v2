@@ -116,8 +116,12 @@ const App = () => {
             );
         } else if (newState.logId) {
             // console.log("exist");
+            const finishState =
+                newState.condition === "Loaded" ||
+                newState.condition === "Free" ||
+                newState.condition === "Blocked";
             let updatedLog;
-            if (newState.condition !== "Half") {
+            if (finishState) {
                 updatedLog = await databases.updateDocument(
                     dbId,
                     collections.loadingLogs,
@@ -177,7 +181,7 @@ const App = () => {
                 return updatedTrucks;
             });
 
-            if (newState.condition !== "Half") {
+            if (finishState) {
                 setLogs((preLogs) => {
                     const updatedLogs = [...preLogs];
                     const selectedLog = updatedLogs.find(
