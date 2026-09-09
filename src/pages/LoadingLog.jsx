@@ -304,7 +304,7 @@ const LoadingLog = ({ logs }) => {
                                     return (
                                         <LoadingLogRow
                                             date={
-                                                dateRef.current.value
+                                                dateRef.current
                                                     ? dateRef.current.value
                                                     : new Date()
                                                           .toISOString()
