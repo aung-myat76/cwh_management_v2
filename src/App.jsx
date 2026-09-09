@@ -116,14 +116,17 @@ const App = () => {
             );
         } else if (newState.logId) {
             // console.log("exist");
-            const updatedLog = await databases.updateDocument(
-                dbId,
-                collections.loadingLogs,
-                newState.logId,
-                {
-                    finish_time: new Date()
-                }
-            );
+            let updatedLog;
+            if (newState.condition !== "Half") {
+                updatedLog = await databases.updateDocument(
+                    dbId,
+                    collections.loadingLogs,
+                    newState.logId,
+                    {
+                        finish_time: new Date()
+                    }
+                );
+            }
             // console.log(updatedLog);
             // const { data } = await supabase
             //     .from("loading-log")
@@ -146,14 +149,18 @@ const App = () => {
                 // console.log(99);
                 truck = {
                     ...newState,
-                    condition: newState.condition,
+                    // condition: newState.condition,
                     truck_no: null,
                     wh_or_sale: null,
                     type: null,
                     distributor: null,
                     logId: null
                 };
+            } else if (newState.condition === "Loaded") {
+                truck.logId = null;
             }
+
+            truck.condition = newState.condition;
 
             setTrucks((preTrucks) => {
                 const updatedTrucks = [...preTrucks];
@@ -166,22 +173,25 @@ const App = () => {
                 updatedTruck["type"] = truck.type;
                 updatedTruck["wh_or_sale"] = truck.wh_or_sale;
                 updatedTruck["distributor"] = truck.distributor;
-                updatedTruck["logId"] =
-                    truck.condition === "Loaded" ? truck.logId : null;
+                updatedTruck["logId"] = truck.logId;
                 return updatedTrucks;
             });
 
-            setLogs((preLogs) => {
-                const updatedLogs = [...preLogs];
-                const selectedLog = updatedLogs.find(
-                    (l) => l.$id === newState.logId
-                );
-                // console.log(selectedLog, updatedLog);
-                if (selectedLog) {
-                    selectedLog.finish_time = updatedLog.finish_time;
-                }
-                return updatedLogs;
-            });
+            if (newState.condition !== "Half") {
+                setLogs((preLogs) => {
+                    const updatedLogs = [...preLogs];
+                    const selectedLog = updatedLogs.find(
+                        (l) => l.$id === newState.logId
+                    );
+                    console.log(selectedLog, updatedLog);
+                    if (selectedLog) {
+                        selectedLog.finish_time = updatedLog.finish_time
+                            ? updatedLog.finish_time
+                            : null;
+                    }
+                    return updatedLogs;
+                });
+            }
             // console.log(truck);
 
             return await databases.updateDocument(
