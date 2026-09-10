@@ -127,7 +127,8 @@ const App = () => {
                     collections.loadingLogs,
                     newState.logId,
                     {
-                        finish_time: new Date()
+                        finish_time: new Date(),
+                        
                     }
                 );
             }
@@ -160,6 +161,9 @@ const App = () => {
                     distributor: null,
                     logId: null
                 };
+            } else if (newState.condition === "Loaded") {
+                ...newState,
+                    logId: null
             }
 
             truck.condition = newState.condition;
