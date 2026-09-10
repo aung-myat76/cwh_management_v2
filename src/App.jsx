@@ -179,7 +179,7 @@ const App = () => {
                 return updatedTrucks;
             });
 
-            if (finishState) {
+            if (finishState && newState.logId) {
                 setLogs((preLogs) => {
                     const updatedLogs = [...preLogs];
                     const selectedLog = updatedLogs.find(
