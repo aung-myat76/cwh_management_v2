@@ -162,8 +162,8 @@ const App = () => {
                     logId: null
                 };
             } else if (newState.condition === "Loaded") {
-                ...newState,
-                    logId: null
+                truck = {...newState,
+                    logId: null}
             }
 
             truck.condition = newState.condition;
