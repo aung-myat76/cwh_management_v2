@@ -114,7 +114,7 @@ const App = () => {
                 id,
                 { ...newState, logId: newLog.$id }
             );
-        } else if (newState.logId) {
+        } else if (newState.logId || newState.condition === "Free") {
             // console.log("exist");
             const finishState =
                 newState.condition === "Loaded" ||
