@@ -467,7 +467,8 @@ const App = () => {
                         Query.lessThanEqual(
                             "$createdAt",
                             getByDate(new Date()).endOfDay
-                        )
+                        ),
+                        Query.limit(100)
                     ])
                 ];
                 const [trucks, packaging, logs] = await Promise.all(prom);
