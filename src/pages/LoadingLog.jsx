@@ -35,7 +35,8 @@ const LoadingLog = ({ logs, trucks }) => {
                     Query.lessThanEqual(
                         "$createdAt",
                         getByDate(new Date(date)).endOfDay
-                    )
+                    ),
+                    Query.limit(100)
                 ]
             );
             // const res = await supabase
