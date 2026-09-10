@@ -121,7 +121,7 @@ const App = () => {
                 newState.condition === "Free" ||
                 newState.condition === "Blocked";
             let updatedLog;
-            if (finishState) {
+            if (finishState && newState.logId) {
                 updatedLog = await databases.updateDocument(
                     dbId,
                     collections.loadingLogs,
