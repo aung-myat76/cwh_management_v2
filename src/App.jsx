@@ -114,7 +114,11 @@ const App = () => {
                 id,
                 { ...newState, logId: newLog.$id }
             );
-        } else if (newState.logId || newState.condition === "Free") {
+        } else if (
+            newState.logId ||
+            newState.condition === "Free" ||
+            newState.condition === "Blocked"
+        ) {
             // console.log("exist");
             const finishState =
                 newState.condition === "Loaded" ||
@@ -127,8 +131,7 @@ const App = () => {
                     collections.loadingLogs,
                     newState.logId,
                     {
-                        finish_time: new Date(),
-                        
+                        finish_time: new Date()
                     }
                 );
             }
@@ -162,8 +165,7 @@ const App = () => {
                     logId: null
                 };
             } else if (newState.condition === "Loaded") {
-                truck = {...newState,
-                    logId: null}
+                truck = { ...newState, logId: null };
             }
 
             truck.condition = newState.condition;
