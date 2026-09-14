@@ -4,6 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
-    base: "/cwh_management_v2"
+    plugins: [react(), tailwindcss()]
+    // base: "/cwh_management_v2"
 });
