@@ -3,7 +3,6 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
-    "homepage": "https://aung-myat76.github.io/cwh_management_v2/",
     "scripts": {
         "dev": "vite",
         "build": "vite build",
