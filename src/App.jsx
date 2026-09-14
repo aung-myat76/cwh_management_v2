@@ -714,60 +714,58 @@ const App = () => {
     };
 
     return (
-        <Router>
-            <Routes>
+        <Routes>
+            <Route
+                path="/"
+                element={
+                    <MainLayout
+                        // handleReset={handleReset}
+                        getLastUpdatedTime={getLastUpdatedTime}
+                    />
+                }>
                 <Route
-                    path="/"
+                    index
                     element={
-                        <MainLayout
-                            // handleReset={handleReset}
-                            getLastUpdatedTime={getLastUpdatedTime}
+                        <Loading
+                            trucks={trucks}
+                            loading={loading}
+                            updateLog={updateLog}
+                            updateTruck={updateTruck}
+                            updateCondition={updateCondition}
                         />
-                    }>
-                    <Route
-                        index
-                        element={
-                            <Loading
-                                trucks={trucks}
-                                loading={loading}
-                                updateLog={updateLog}
-                                updateTruck={updateTruck}
-                                updateCondition={updateCondition}
-                            />
-                        }
-                    />
-                    <Route
-                        path="/loading-log"
-                        element={
-                            <LoadingLog
-                                logs={logs}
-                                trucks={trucks}
-                                // setLoadingLogs={setLoadingLogs}
-                                updateLog={updateLog}
-                                deleteLog={deleteLog}
-                            />
-                        }
-                    />
-                    <Route
-                        path="/packaging"
-                        element={
-                            <Packaging lines={lines} updateLine={updateLine} />
-                        }
-                    />
-                    <Route
-                        path="/setting"
-                        element={
-                            <Setting
-                                resetLoadingLogsByDate={resetLoadingLogsByDate}
-                                resetLoadingBay={resetLoadingBay}
-                            />
-                        }
-                    />
-                    <Route path="*" element={<Navigate to={"/"} />} />
-                    {/* {trucks.length > 0 && <Packaging />} */}
-                </Route>
-            </Routes>
-        </Router>
+                    }
+                />
+                <Route
+                    path="/loading-log"
+                    element={
+                        <LoadingLog
+                            logs={logs}
+                            trucks={trucks}
+                            // setLoadingLogs={setLoadingLogs}
+                            updateLog={updateLog}
+                            deleteLog={deleteLog}
+                        />
+                    }
+                />
+                <Route
+                    path="/packaging"
+                    element={
+                        <Packaging lines={lines} updateLine={updateLine} />
+                    }
+                />
+                <Route
+                    path="/setting"
+                    element={
+                        <Setting
+                            resetLoadingLogsByDate={resetLoadingLogsByDate}
+                            resetLoadingBay={resetLoadingBay}
+                        />
+                    }
+                />
+                <Route path="*" element={<Navigate to={"/"} />} />
+                {/* {trucks.length > 0 && <Packaging />} */}
+            </Route>
+        </Routes>
     );
 };
 
