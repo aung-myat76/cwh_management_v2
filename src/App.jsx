@@ -7,7 +7,12 @@ import "./App.css";
 // import { supabase } from "./superbaseClient";
 import Packaging from "./pages/Packaging";
 import MainLayout from "./layout/MainLayout";
-import { Navigate, Route, Routes, HashRouter } from "react-router-dom";
+import {
+    Navigate,
+    Route,
+    Routes,
+    HashRouter as Router
+} from "react-router-dom";
 import Loading from "./pages/Loading";
 import LoadingLog from "./pages/LoadingLog";
 // import getByDate from "./lib/getByDate";
@@ -709,7 +714,7 @@ const App = () => {
     };
 
     return (
-        // <HashRouter>
+        // <Router>
         <Routes>
             <Route
                 path="/"
@@ -762,7 +767,7 @@ const App = () => {
                 {/* {trucks.length > 0 && <Packaging />} */}
             </Route>
         </Routes>
-        // </HashRouter>
+        // </Router>
     );
 };
 
