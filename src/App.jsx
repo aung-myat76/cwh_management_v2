@@ -526,8 +526,14 @@ const App = () => {
                 );
             }
         });
-
-        return () => unsubscribe();
+        // console.log(unsubscribe);
+        return () => {
+            unsubscribe.then((unsubscribe) => {
+                if (typeof unsubscribe === "function") {
+                    unsubscribe();
+                }
+            });
+        };
     }, []);
 
     const updateLog = (id, updatedLog) => {
