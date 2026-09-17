@@ -6,7 +6,7 @@
     "display": "standalone",
     "icons": [
         {
-            "src": "/cwh_management_v2/public/truck2.svg",
+            "src": "./truck2.svg",
             "sizes": "192x192",
             "type": "image/svg+xml"
         }
