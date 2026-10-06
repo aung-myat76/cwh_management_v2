@@ -192,6 +192,7 @@ const Modal = ({
                                 <option value={"NMMK"}>NMMK</option>
                                 <option value={"N-Star"}>N-Star</option>
                                 <option value={"T-Party"}>T-Party</option>
+                                <option value={"Mobile"}>Mobile</option>
                                 <option value={"Other"}>Other</option>
                             </select>
                             <select
