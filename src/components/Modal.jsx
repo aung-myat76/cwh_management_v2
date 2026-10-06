@@ -176,10 +176,10 @@ const Modal = ({
                                 ref={distributorRef}
                                 defaultValue={distributor}
                                 placeholder={
-                                    !distributor ? "Distributor" : distributor
+                                    !distributor ? "Transporter" : distributor
                                 }
                                 className="w-1/2 p-1 text-center text-lg font-bold bg-stone-100 text-stone-900 rounded-sm focus:outline-none">
-                                <option value={""}>Distributor</option>
+                                <option value={""}>Transporters</option>
                                 <option value={"MBL"}>MBL</option>
                                 <option value={"Nehru"}>Nehru</option>
                                 <option value={"TPN"}>TPN</option>
